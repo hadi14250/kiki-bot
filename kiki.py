@@ -15,7 +15,7 @@ hundredUserInterval = 60
 thousandUserInterval = 600
 
 
-userNum = 102
+userNum = 1
 
 i = 1
 
