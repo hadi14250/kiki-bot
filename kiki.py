@@ -5,8 +5,11 @@ import sys
 import os
 import requests
 from utils import requestsFallback
+from utils import reqInstaUrl
+import pandas as pd
+from openpyxl import load_workbook
 
-timeout = 20
+timeout = 10
 
 shortRestTime  = 1
 longRestTime = 5
@@ -14,8 +17,13 @@ fiveUserInterval = 10
 hundredUserInterval = 60
 thousandUserInterval = 600
 
+# shortRestTime  = 0.1
+# longRestTime = 0.1
+# fiveUserInterval = 0.1
+# hundredUserInterval = 60
+# thousandUserInterval = 600
 
-userNum = 102
+userNum = 101
 
 i = 1
 
@@ -26,141 +34,70 @@ headers = {
 
 #  -----------> user <---------- 
 while i <= userNum:
-    try:
-        url = "https://www.instagram.com/p/CuhDVBQt5P4/?img_index=1"
-        fp = urllib.request.urlopen(url, timeout=timeout)
-        mybytes = fp.read()
-        htmlText = mybytes.decode("utf8")
-        fp.close()
 
-    except urllib.error.URLError as e:
-        if isinstance(e.reason, socket.timeout):
-            sys.stderr.write("\033[91mInstagram For User {}, The request timed out after {} seconds.\n\033[0m".format(i, timeout))
-            htmlText = requestsFallback(i, url, timeout, headers)
-        else:
-            sys.stderr.write("\033[91mInstagram For User {}, URL Error: {}\n\033[0m".format(i, e))
-            htmlText = requestsFallback(i, url, timeout, headers)
-    except Exception as e:
-        sys.stderr.write("\033[91mInstagram For User {}, Something went wrong: {}\n\033[0m".format(i, e))
-        htmlText = requestsFallback(i, url, timeout, headers)
-
-    with open("instagram.html", "w") as file:
-        file.write(htmlText)
+    #   ---> instagram Profile<---
+    url = "https://www.instagram.com/takeovr23/?igshid=MXJucG91aXgyMnhpZg%3D%3D"
     
-    time.sleep(shortRestTime)
+    htmlText = reqInstaUrl(i, url, timeout, headers, "Instagram Profile")
 
-    try:
-        url = "https://www.tiktok.com/@salzabilll_/video/7297133409426590982"
-        fp = urllib.request.urlopen(url, timeout=timeout)
-        mybytes = fp.read()
-        htmlText = mybytes.decode("utf8")
-        fp.close()
-
-    except urllib.error.URLError as e:
-        if isinstance(e.reason, socket.timeout):
-            sys.stderr.write("\033[91mTiktok For User {}, The request timed out after {} seconds.\n\033[0m".format(i, timeout))
-            htmlText = requestsFallback(i, url, timeout, headers)
-        else:
-            sys.stderr.write("\033[91mTiktok For User {}, URL Error: {}\n\033[0m".format(i, e))
-            htmlText = requestsFallback(i, url, timeout, headers)
-    except Exception as e:
-        sys.stderr.write("\033[91mTiktok For User {}, Something went wrong: {}\n\033[0m".format(i, e))
-        htmlText = requestsFallback(i, url, timeout, headers)
-
-    with open("tiktok.html", "w") as file:
+    if (htmlText != None):
+        with open("instagramProfile.html", "w") as file:
             file.write(htmlText)
-
-    time.sleep(shortRestTime)
-
-    try:
-        url = "https://www.facebook.com/zuck/posts/pfbid02H6zic124gqoP8YqarK3g6CcWA4erRbh51VkM3mV83mQdbxSwovqNtY85vqBwnBael"
-        fp = urllib.request.urlopen(url, timeout=timeout)
-        mybytes = fp.read()
-        htmlText = mybytes.decode("utf8")
-        fp.close()
-
-    except urllib.error.URLError as e:
-        if isinstance(e.reason, socket.timeout):
-            sys.stderr.write("\033[91mFacebook For User {}, The request timed out after {} seconds.\n\033[0m".format(i, timeout))
-            htmlText = requestsFallback(i, url, timeout, headers)
-        else:
-            sys.stderr.write("\033[91mFacebook For User {}, URL Error: {}\n\033[0m".format(i, e))
-            htmlText = requestsFallback(i, url, timeout, headers)
-    except Exception as e:
-        sys.stderr.write("\033[91mFacebook For User {}, Something went wrong: {}\n\033[0m".format(i, e))
-        htmlText = requestsFallback(i, url, timeout, headers)
-
-    with open("facebook.html", "w") as file:
-        file.write(htmlText)
-
-    time.sleep(shortRestTime)
-
-    try:
-        url = "https://www.instagram.com/p/CuhDVBQt5P4/?img_index=1"
-        fp = urllib.request.urlopen(url, timeout=timeout)
-        mybytes = fp.read()
-        htmlText = mybytes.decode("utf8")
-        fp.close()
-
-    except urllib.error.URLError as e:
-        if isinstance(e.reason, socket.timeout):
-            sys.stderr.write("\033[91mInstagram For User {}, The request timed out after {} seconds.\n\033[0m".format(i, timeout))
-            htmlText = requestsFallback(i, url, timeout, headers)
-        else:
-            sys.stderr.write("\033[91mInstagram For User {}, URL Error: {}\n\033[0m".format(i, e))
-            htmlText = requestsFallback(i, url, timeout, headers)
-    except Exception as e:
-        sys.stderr.write("\033[91mInstagram For User {}, Something went wrong: {}\n\033[0m".format(i, e))
-        htmlText = requestsFallback(i, url, timeout, headers)
-
-    with open("instagram.html", "w") as file:
-        file.write(htmlText)
-   
-    time.sleep(shortRestTime)
-
-    try:
-        url = "https://www.tiktok.com/@salzabilll_/video/7297133409426590982"
-        fp = urllib.request.urlopen(url, timeout=timeout)
-        mybytes = fp.read()
-        htmlText = mybytes.decode("utf8")
-        fp.close()
-
-    except urllib.error.URLError as e:
-        if isinstance(e.reason, socket.timeout):
-            sys.stderr.write("\033[91mTiktok For User {}, The request timed out after {} seconds.\n\033[0m".format(i, timeout))
-            htmlText = requestsFallback(i, url, timeout, headers)
-        else:
-            sys.stderr.write("\033[91mTiktok For User {}, URL Error: {}\n\033[0m".format(i, e))
-            htmlText = requestsFallback(i, url, timeout, headers)
-    except Exception as e:
-        sys.stderr.write("\033[91mTiktok For User {}, Something went wrong: {}\n\033[0m".format(i, e))
-        htmlText = requestsFallback(i, url, timeout, headers)
-
-    with open("tiktok.html", "w") as file:
-        file.write(htmlText)
-
-    time.sleep(shortRestTime)
-
-    try:
-        url = "https://www.facebook.com/zuck/posts/pfbid02H6zic124gqoP8YqarK3g6CcWA4erRbh51VkM3mV83mQdbxSwovqNtY85vqBwnBael"
-        fp = urllib.request.urlopen(url, timeout=timeout)
-        mybytes = fp.read()
-        htmlText = mybytes.decode("utf8")
-        fp.close()
-
-    except urllib.error.URLError as e:
-        if isinstance(e.reason, socket.timeout):
-            sys.stderr.write("\033[91mFacebook For User {}, The request timed out after {} seconds.\n\033[0m".format(i, timeout))
-            htmlText = requestsFallback(i, url, timeout, headers)
-        else:
-            sys.stderr.write("\033[91mFacebook For User {}, URL Error: {}\n\033[0m".format(i, e))
-            htmlText = requestsFallback(i, url, timeout, headers)
-    except Exception as e:
-        sys.stderr.write("\033[91mFacebook For User {}, Something went wrong: {}\n\033[0m".format(i, e))
-        htmlText = requestsFallback(i, url, timeout, headers)
     
-    with open("facebook.html", "w") as file:
-        file.write(htmlText)
+    time.sleep(shortRestTime)
+
+    #   ---> tiktok Profile<---
+    url = "https://www.tiktok.com/@thezachchoi"
+
+    htmlText = reqInstaUrl(i, url, timeout, headers, "Tiktok Profile")
+    
+    if (htmlText != None):
+        with open("tiktokProfile.html", "w") as file:
+                file.write(htmlText)
+
+    time.sleep(shortRestTime)
+
+    #   ---> facebook Profile<---
+    # url = "https://www.facebook.com/photo?fbid=868551677967530&set=a.285784912910879"
+
+    # htmlText = reqInstaUrl(i, url, timeout, headers, "Facebook Profile")
+
+    # if (htmlText != None):
+    #     with open("facebookProfile.html", "w") as file:
+    #        file.write(htmlText)
+
+    # time.sleep(shortRestTime)
+
+    #   ---> instagram Post<---
+    url = "https://www.instagram.com/p/CzTWqUWLLvJ/"
+
+    htmlText = reqInstaUrl(i, url, timeout, headers, "Instagram Post")
+
+    if (htmlText != None):
+        with open("instagramPost.html", "w") as file:
+            file.write(htmlText)
+    
+    time.sleep(shortRestTime)
+
+    #   ---> tiktok Post<---
+    url = "https://www.tiktok.com/@thezachchoi/video/7298038955348397354"
+
+    htmlText = reqInstaUrl(i, url, timeout, headers, "Tiktok Post")
+    
+    if (htmlText != None):
+        with open("tiktokPost.html", "w") as file:
+                file.write(htmlText)
+
+    # time.sleep(shortRestTime)
+
+    # #   ---> facebook Post<---
+    # url = "https://www.facebook.com/zuck/posts/pfbid0D5Q18BpW1php3hPmVeJznSQHExp7WJEQLEECj9g5eQuoddmP8MvLFK5qGE76HoL1l"
+
+    # htmlText = reqInstaUrl(i, url, timeout, headers, "Facebook Post")
+
+    # if (htmlText != None):
+    #     with open("facebookPost.html", "w") as file:
+    #         file.write(htmlText)
     #  -----------> user <---------- 
 
     print(f"\033[92mUser Number {i} finished.\033[0m")
