@@ -80,8 +80,11 @@ for index, row in df.iterrows():
     )
     user_objects.append(user_object)
 
+
+userNum = 13
+i = 1
 # Now user_objects is a list containing User objects for all users
-for user in user_objects:
+for user in user_objects[:userNum]:
     print("UserNum:", user.UserNum)
     print("Full Name:", user.fullName)
     print("Instagram Profile URL:", user.insta.profileUrl)
@@ -92,3 +95,6 @@ for user in user_objects:
     print("Total Prize:", user.totalPrize)
     print("{}'s Wallet Address:".format(user.fullName), user.walletAdd)
     print("-------------")
+    i += 1
+
+print("Data from excel Sheet reading done")

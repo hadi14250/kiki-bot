@@ -8,6 +8,7 @@ from utils import requestsFallback
 from utils import reqInstaUrl
 import pandas as pd
 from openpyxl import load_workbook
+from user import User, user_objects
 
 timeout = 10
 
@@ -23,7 +24,7 @@ thousandUserInterval = 600
 # hundredUserInterval = 60
 # thousandUserInterval = 600
 
-userNum = 101
+userNum = 11
 
 i = 1
 
