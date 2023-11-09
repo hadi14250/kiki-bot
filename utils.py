@@ -49,3 +49,16 @@ def reqInstaUrl(i, url, timeout, headers, socialMedia):
         sys.stderr.write("\033[91m{} For User {}, Something went wrong: {}\n\033[0m".format(socialMedia, i, e))
         htmlText = requestsFallback(i, url, timeout, headers)
     return (htmlText)
+
+def restFetch(i, longRestTime, fiveUserInterval, hundredUserInterval, thousandUserInterval):
+    if (i % 1000 == 0):
+        print("\033[1m{} Users Done, Resting for {} seconds\033[0m".format(i, thousandUserInterval))
+        time.sleep(thousandUserInterval)
+    elif (i % 100 == 0):
+        print("\033[94m{} Users Done, Resting for {} seconds\033[0m".format(i, hundredUserInterval))
+        time.sleep(hundredUserInterval)
+    elif (i % 5 == 0):
+        print("\033[93m{} Users Done, Resting for {} seconds\033[0m".format(i, fiveUserInterval))
+        time.sleep(fiveUserInterval)
+    else:
+        time.sleep(longRestTime)

@@ -4,8 +4,8 @@ import time
 import sys
 import os
 import requests
-from utils import requestsFallback
-from utils import reqInstaUrl
+from utils import requestsFallback, reqInstaUrl, restFetch
+
 import pandas as pd
 from openpyxl import load_workbook
 from user import User, user_objects
@@ -24,7 +24,9 @@ thousandUserInterval = 600
 # hundredUserInterval = 60
 # thousandUserInterval = 600
 
-userNum = 11
+# userNum = len(user_objects)
+userNum = 6
+print("Total User in excel Sheet: {}".format(userNum))
 
 i = 1
 
@@ -34,86 +36,62 @@ headers = {
 }
 
 #  -----------> user <---------- 
-while i <= userNum:
+for user in user_objects[:userNum]:
 
     #   ---> instagram Profile<---
-    url = "https://www.instagram.com/takeovr23/?igshid=MXJucG91aXgyMnhpZg%3D%3D"
-    
-    htmlText = reqInstaUrl(i, url, timeout, headers, "Instagram Profile")
 
-    if (htmlText != None):
-        with open("instagramProfile.html", "w") as file:
-            file.write(htmlText)
+    url = user.insta.profileUrl
+    if not(pd.isna(url)):
+        user.insta.status = True
     
-    time.sleep(shortRestTime)
+    if (user.insta.status == True):
+        htmlText = reqInstaUrl(user.UserNum, url, timeout, headers, "Instagram Profile")
+        if (htmlText != None):
+            with open("instagramProfile.html", "w") as file:
+                file.write(htmlText)
+        time.sleep(shortRestTime)
+    else:
+        print(f"User Number {user.UserNum}, {user.fullName}, does not have an instagram field")
 
     #   ---> tiktok Profile<---
-    url = "https://www.tiktok.com/@thezachchoi"
-
-    htmlText = reqInstaUrl(i, url, timeout, headers, "Tiktok Profile")
     
-    if (htmlText != None):
-        with open("tiktokProfile.html", "w") as file:
-                file.write(htmlText)
-
-    time.sleep(shortRestTime)
-
-    #   ---> facebook Profile<---
-    # url = "https://www.facebook.com/photo?fbid=868551677967530&set=a.285784912910879"
-
-    # htmlText = reqInstaUrl(i, url, timeout, headers, "Facebook Profile")
-
-    # if (htmlText != None):
-    #     with open("facebookProfile.html", "w") as file:
-    #        file.write(htmlText)
-
-    # time.sleep(shortRestTime)
+    url = user.tiktok.profileUrl
+    if not(pd.isna(url)):
+        user.tiktok.status = True
+    if (user.tiktok.status == True):
+        htmlText = reqInstaUrl(user.UserNum, url, timeout, headers, "Tiktok Profile")
+        if (htmlText != None):
+            with open("tiktokProfile.html", "w") as file:
+                    file.write(htmlText)
+        time.sleep(shortRestTime)
+    else:
+        print(f"User Number {user.UserNum}, {user.fullName}, does not have an tiktok field")
 
     #   ---> instagram Post<---
-    url = "https://www.instagram.com/p/CzTWqUWLLvJ/"
-
-    htmlText = reqInstaUrl(i, url, timeout, headers, "Instagram Post")
-
-    if (htmlText != None):
-        with open("instagramPost.html", "w") as file:
-            file.write(htmlText)
-    
-    time.sleep(shortRestTime)
+    url = user.insta.postUrl
+    if (user.insta.status == True):
+        htmlText = reqInstaUrl(user.UserNum, url, timeout, headers, "Instagram Post")
+        if (htmlText != None):
+            with open("instagramPost.html", "w") as file:
+                file.write(htmlText)
+        time.sleep(shortRestTime)
+    else:
+        print(f"Skipping Instagram post for {user.fullName} as no profile url specified")
 
     #   ---> tiktok Post<---
-    url = "https://www.tiktok.com/@thezachchoi/video/7298038955348397354"
+    url = user.tiktok.postUrl
+    if (user.tiktok.status == True):
+        htmlText = reqInstaUrl(i, url, timeout, headers, "Tiktok Post")
+        if (htmlText != None):
+            with open("tiktokPost.html", "w") as file:
+                    file.write(htmlText)
+    else:
+        print(f"Skipping tiktok post for {user.fullName} as no profile url specified")
 
-    htmlText = reqInstaUrl(i, url, timeout, headers, "Tiktok Post")
-    
-    if (htmlText != None):
-        with open("tiktokPost.html", "w") as file:
-                file.write(htmlText)
+    print(f"\033[92mUser Number {user.UserNum}, {user.fullName} finished.\033[0m")
 
-    # time.sleep(shortRestTime)
-
-    # #   ---> facebook Post<---
-    # url = "https://www.facebook.com/zuck/posts/pfbid0D5Q18BpW1php3hPmVeJznSQHExp7WJEQLEECj9g5eQuoddmP8MvLFK5qGE76HoL1l"
-
-    # htmlText = reqInstaUrl(i, url, timeout, headers, "Facebook Post")
-
-    # if (htmlText != None):
-    #     with open("facebookPost.html", "w") as file:
-    #         file.write(htmlText)
-    #  -----------> user <---------- 
-
-    print(f"\033[92mUser Number {i} finished.\033[0m")
-
-    if (i % 1000 == 0 and i != userNum):
-        print("\033[1m{} Users Done, Resting for {} seconds\033[0m".format(i, thousandUserInterval))
-        time.sleep(thousandUserInterval)
-    elif (i % 100 == 0 and i != userNum):
-        print("\033[94m{} Users Done, Resting for {} seconds\033[0m".format(i, hundredUserInterval))
-        time.sleep(hundredUserInterval)
-    elif (i % 5 == 0 and i != userNum):
-        print("\033[93m{} Users Done, Resting for {} seconds\033[0m".format(i, fiveUserInterval))
-        time.sleep(fiveUserInterval)
-    elif (i != userNum):
-        time.sleep(longRestTime)
+    restFetch(i, longRestTime, fiveUserInterval,
+              hundredUserInterval, thousandUserInterval)
 
     i += 1
 
