@@ -32,7 +32,7 @@ def requestsFallback(i, url, timeout, headers):
         print(f"Request timed out: {e}")
         return None
 
-def reqInstaUrl(i, url, timeout, headers, socialMedia):
+def reqUrl(i, url, timeout, headers, socialMedia):
     try:
         fp = urllib.request.urlopen(url, timeout=timeout)
         mybytes = fp.read()
