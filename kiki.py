@@ -47,7 +47,7 @@ for user in user_objects[:userNum]:
     if (user.insta.status == True):
         htmlText = reqInstaUrl(user.UserNum, url, timeout, headers, "Instagram Profile")
         if (htmlText != None):
-            with open("instagramProfile.html", "w") as file:
+            with open("instagramProfile.html", "w", encoding="utf-8") as file:
                 file.write(htmlText)
         time.sleep(shortRestTime)
     else:
@@ -61,7 +61,7 @@ for user in user_objects[:userNum]:
     if (user.tiktok.status == True):
         htmlText = reqInstaUrl(user.UserNum, url, timeout, headers, "Tiktok Profile")
         if (htmlText != None):
-            with open("tiktokProfile.html", "w") as file:
+            with open("tiktokProfile.html", "w", encoding="utf-8") as file:
                     file.write(htmlText)
         time.sleep(shortRestTime)
     else:
@@ -72,7 +72,7 @@ for user in user_objects[:userNum]:
     if (user.insta.status == True):
         htmlText = reqInstaUrl(user.UserNum, url, timeout, headers, "Instagram Post")
         if (htmlText != None):
-            with open("instagramPost.html", "w") as file:
+            with open("instagramPost.html", "w", encoding="utf-8") as file:
                 file.write(htmlText)
         time.sleep(shortRestTime)
     else:
@@ -83,7 +83,7 @@ for user in user_objects[:userNum]:
     if (user.tiktok.status == True):
         htmlText = reqInstaUrl(i, url, timeout, headers, "Tiktok Post")
         if (htmlText != None):
-            with open("tiktokPost.html", "w") as file:
+            with open("tiktokPost.html", "w", encoding="utf-8") as file:
                     file.write(htmlText)
     else:
         print(f"Skipping tiktok post for {user.fullName} as no profile url specified")
