@@ -1,7 +1,7 @@
 import requests
 from requests.exceptions import RequestException
-
 from pprint import pprint
+import threading
 
 twitterHandle = "ordinalHO"
 twitterSession = "?t=jkhlbh&s=04"
@@ -33,6 +33,10 @@ except requests.exceptions.SSLError as e:
 except requests.exceptions.Timeout as e:
     print(f"Request timed out: {e}")
 
+with open('webScraperProfile.html', 'wb') as f:
+    f.write(profileResponse.content)
+
+
 payload = {
     "source": "universal",
     "url": "https://twitter.com/billyrestey/status/1723108332591030474?t=jqnZFH3KytAI1zwsOJyU-A&s=19",
@@ -56,10 +60,6 @@ except requests.exceptions.SSLError as e:
     print(f"SSL/TLS handshake error: {e}")
 except requests.exceptions.Timeout as e:
     print(f"Request timed out: {e}")
-
-# Save returned HTML to result.html file
-with open('webScraperProfile.html', 'wb') as f:
-    f.write(profileResponse.content)
 
 with open('webScraperTweet.html', 'wb') as f:
     f.write(tweetResponse.content)
