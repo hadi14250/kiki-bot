@@ -1,7 +1,8 @@
 import requests
 import threading
-from requests.exceptions import RequestException
 import time
+from requests.exceptions import RequestException, ConnectionError, HTTPError, Timeout, TooManyRedirects, SSLError
+
 
 def make_request(payload, flag):
     try:
@@ -11,6 +12,7 @@ def make_request(payload, flag):
             auth=('hadi14250', '05590560352Hk200018'), #Your credentials go here
             json=payload,
         )
+        response.raise_for_status()  # Raise HTTPError for bad responses (4xx, 5xx)
         if (flag == "twitterProfile"):
             with open('twitterProfile.html', 'wb') as f:
                 f.write(response.content)
@@ -29,16 +31,8 @@ def make_request(payload, flag):
         elif (flag == "tiktokPost"):
             with open('tiktokPost.html', 'wb') as f:
                 f.write(response.content)
-    except requests.ConnectionError as e:
+    except (ConnectionError, HTTPError, Timeout, TooManyRedirects, SSLError, RequestException) as e:
         print(f"An error occurred: {e}")
-    except RequestException as e:
-        print(f"An error occurred: {e}")
-    except requests.exceptions.RequestException as e:
-        print(f"An error occurred: {e}")
-    except requests.exceptions.SSLError as e:
-        print(f"SSL/TLS handshake error: {e}")
-    except requests.exceptions.Timeout as e:
-        print(f"Request timed out: {e}")
 
 
 
@@ -83,15 +77,15 @@ tiktokPostPayload = {
 }
 
 thread1 = threading.Thread(target=make_request, args=(twitterProfilePayload, "twitterProfile"))
-# time.sleep(1)
+time.sleep(0.5)
 thread2 = threading.Thread(target=make_request, args=(tweetPayload, "tweet"))
-# time.sleep(1)
+time.sleep(0.5)
 thread3 = threading.Thread(target=make_request, args=(instagramProfilePayload, "instagramProfile"))
-# time.sleep(1)
+time.sleep(0.5)
 thread4 = threading.Thread(target=make_request, args=(instagramPostPayload, "instagramPost"))
-# time.sleep(1)
+time.sleep(0.5)
 thread5 = threading.Thread(target=make_request, args=(tiktokProfilePayload, "tiktokProfile"))
-# time.sleep(1)
+time.sleep(0.5)
 thread6 = threading.Thread(target=make_request, args=(tiktokPostPayload, "tiktokPost"))
 
 # Start the threads
