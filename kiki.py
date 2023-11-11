@@ -26,7 +26,7 @@ thousandUserInterval = 600
 # thousandUserInterval = 600
 
 # userNum = len(user_objects)
-userNum = 11
+userNum = 1
 print("Total User in excel Sheet: {}".format(userNum))
 
 i = 1
