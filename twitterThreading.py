@@ -28,37 +28,30 @@ def printHtml(content, filename, dirName):
     with open(filename, 'w', encoding='utf-8') as f:
         f.write(content)
 
-def create_thread(url, filename):
-    thread = threading.Thread(target=make_request, args=(url, filename))
+def create_thread(payload, filename):
+    thread = threading.Thread(target=make_request, args=(payload, filename))
     return thread
 
-def make_request(url, filename, retry_attempts=3, retry_delay=5):
-	proxies = {
-		'http': 'http://hadi14250:!SrJY8SUHSYp8nB@unblock.oxylabs.io:60000',
-		'https': 'http://hadi14250:!SrJY8SUHSYp8nB@unblock.oxylabs.io:60000',
-	}
-	headers = {
-    "X-Oxylabs-Render": "html"
-	}
-	for attempt in range(retry_attempts):   
-		try:
-			response = requests.get(
-				url,
-				verify=False,  # Ignore the certificate
-				proxies=proxies,
-				headers=headers,
-			)
-			response.raise_for_status()
-			printHtml( response.text, filename, "htmlFiles")
-			break  # Successful request, exit the loop
-		except (ConnectionError, HTTPError, Timeout, TooManyRedirects, SSLError, RequestException) as e:
-			print(f"\033[91mAn error occurred: {e}\033[0m")
-			if attempt < retry_attempts - 1:
-				print(f"\033[94mRetry Number {attempt + 1} for {filename} in {retry_delay} seconds...\033[0m")
-				time.sleep(retry_delay)
-				# make_request
-			else:
-				print(f"\033[91mMax retries reached. Request failed for {filename}\033[0m")
+def make_request(payload, filename, retry_attempts=3, retry_delay=5):
+     for attempt in range(retry_attempts):   
+        try:
+            response = requests.request(
+                'POST',
+                'https://realtime.oxylabs.io/v1/queries',
+                auth=('hadi14250', '!SrJY8SUHSYp8nB'),
+                json=payload,
+            )
+            response.raise_for_status()
+            printHtml( response.text, filename, "htmlFiles")
+            break  # Successful request, exit the loop
+        except (ConnectionError, HTTPError, Timeout, TooManyRedirects, SSLError, RequestException) as e:
+            print(f"An error occurred: {e}")
+            if attempt < retry_attempts - 1:
+                print(f"Retry Number {attempt + 1} for {filename} in {retry_delay} seconds...")
+                time.sleep(retry_delay)
+                # make_request
+            else:
+                print(f"\033[91mMax retries reached. Request failed for {filename}\033[0m")
 
 
 def run_threads(thread_queue, num_threads_to_run):
@@ -83,8 +76,8 @@ def run_threads(thread_queue, num_threads_to_run):
 
 deleteHtmlFiles()
 
-userLimit = 100 # (1 user has 6 requests or 6 threads)
-usersPerBatch = 20
+userLimit = 30 # (1 user has 6 requests or 6 threads)
+usersPerBatch = 15
 
 threads_per_batch = usersPerBatch * 6
 
@@ -92,37 +85,37 @@ threads_per_batch = usersPerBatch * 6
 threads = []
 for user in user_objects[:userLimit]:
     instagramProfileThread = create_thread(
-        user.insta.profileUrl,
+        {"source": "universal", "url": user.insta.profileUrl, "render": "html"},
         'instagram_profile_{}.html'.format(user.fullName)
     )
     threads.append(instagramProfileThread)
 
     instagramPostThread = create_thread(
-        user.insta.postUrl,
+        {"source": "universal", "url": user.insta.postUrl, "render": "html"},
         'instagram_post_{}.html'.format(user.fullName)
     )
     threads.append(instagramPostThread)
 
     tiktokProfileThread = create_thread(
-        user.tiktok.profileUrl,
+        {"source": "universal", "url": user.tiktok.profileUrl, "render": "html"},
         'tiktok_profile_{}.html'.format(user.fullName)
     )
     threads.append(tiktokProfileThread)
 
     tiktokPostThread = create_thread(
-        user.tiktok.postUrl,
+        {"source": "universal", "url": user.tiktok.postUrl, "render": "html"},
         'tiktok_post_{}.html'.format(user.fullName)
     )
     threads.append(tiktokPostThread)
 
     twitterProfileThread = create_thread(
-        user.twitter.profileUrl,
+        {"source": "universal", "url": user.twitter.profileUrl, "render": "html"},
         'twitter_profile_{}.html'.format(user.fullName)
     )
     threads.append(twitterProfileThread)
 
     twitterPostThread = create_thread(
-        user.twitter.postUrl,
+        {"source": "universal", "url": user.twitter.postUrl, "render": "html"},
         'tweet_{}.html'.format(user.fullName)
     )
     threads.append(twitterPostThread)
