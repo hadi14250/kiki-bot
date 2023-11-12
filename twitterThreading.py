@@ -35,7 +35,8 @@ def create_thread(payload, filename):
 def make_request(payload, filename, retry_attempts=3, retry_delay=5):
      for attempt in range(retry_attempts):   
         try:
-            response = requests.post(
+            response = requests.request(
+                'POST',
                 'https://realtime.oxylabs.io/v1/queries',
                 auth=('hadi14250', '05590560352Hk200018'),
                 json=payload,
@@ -75,8 +76,9 @@ def run_threads(thread_queue, num_threads_to_run):
 
 deleteHtmlFiles()
 
-userLimit = 20 # (1 user has 6 requests or 6 threads)
-usersPerBatch = 10
+userLimit = 50 # (1 user has 6 requests or 6 threads)
+usersPerBatch = 15
+
 threads_per_batch = usersPerBatch * 6
 
 
