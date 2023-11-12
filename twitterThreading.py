@@ -2,558 +2,122 @@ import requests
 import time
 import threading
 from requests.exceptions import RequestException, ConnectionError, HTTPError, Timeout, TooManyRedirects, SSLError
+import glob
+import os
+from user import User, user_objects
 
-def make_request(payload, flag, filename):
-    try:
-        response = requests.post(
-            'https://realtime.oxylabs.io/v1/queries',
-            auth=('hadi14250', '05590560352Hk200018'),
-            json=payload,
-        )
-        response.raise_for_status()
-        with open(filename, 'wb') as f:
-            f.write(response.content)
-    except (ConnectionError, HTTPError, Timeout, TooManyRedirects, SSLError, RequestException) as e:
-        print(f"An error occurred: {e}")
 
-def create_thread(payload, flag, filename):
-    thread = threading.Thread(target=make_request, args=(payload, flag, filename))
-    time.sleep(0.5)
-    thread.start()
+def deleteHtmlFiles():
+    curentDir = os.getcwd()
+    pattern = '{}/htmlFiles/*.html'.format(curentDir)
+    print("removing files from {}/htmlFile/*.html".format(curentDir))
+
+    # Get a list of all files matching the pattern
+    html_files = glob.glob(pattern)
+
+    # Remove each file
+    for file in html_files:
+        os.remove(file)
+
+def printHtml(content, filename, dirName):
+    if not os.path.exists(dirName):
+        os.makedirs(dirName)
+
+    filename = os.path.join(dirName, filename)
+
+    with open(filename, 'wb') as f:
+        f.write(content)
+
+def create_thread(payload, filename):
+    thread = threading.Thread(target=make_request, args=(payload, filename))
     return thread
 
-twitterHandle = "ordinalHO"
-twitterSession = "?t=jkhlbh&s=04"
-
-threads = [
-    create_thread(
-        {"source": "universal", "url": f"https://x.com/{twitterHandle}{twitterSession}", "render": "html"},
-        "twitterProfile", 'twitterProfile.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://twitter.com/billyrestey/status/1723108332591030474?t=jqnZFH3KytAI1zwsOJyU-A&s=19", "render": "html"},
-        "tweet", 'tweet.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.instagram.com/pubity/", "render": "html"},
-        "instagramProfile", 'instagramProfile.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.instagram.com/p/CzTWqUWLLvJ/", "render": "html"},
-        "instagramPost", 'instagramPost.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi", "render": "html"},
-        "tiktokProfile", 'tiktokProfile.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi/video/7298038955348397354", "render": "html"},
-        "tiktokPost", 'tiktokPost.html'
-    ),
+def make_request(payload, filename, retry_attempts=3, retry_delay=5):
+     for attempt in range(retry_attempts):   
+        try:
+            response = requests.post(
+                'https://realtime.oxylabs.io/v1/queries',
+                auth=('hadi14250', '05590560352Hk200018'),
+                json=payload,
+            )
+            response.raise_for_status()
+            printHtml( response.content, filename, "htmlFiles")
+            break  # Successful request, exit the loop
+        except (ConnectionError, HTTPError, Timeout, TooManyRedirects, SSLError, RequestException) as e:
+            print(f"An error occurred: {e}")
+            if attempt < retry_attempts - 1:
+                print(f"Retry Number {attempt + 1} for {filename} in {retry_delay} seconds...")
+                time.sleep(retry_delay)
+                # make_request
+            else:
+                print(f"\033[91mMax retries reached. Request failed for {filename}\033[0m")
 
 
+def run_threads(thread_queue, num_threads_to_run):
+    threads_to_run = []
 
-    create_thread(
-        {"source": "universal", "url": f"https://x.com/elonmusk{twitterSession}", "render": "html"},
-        "twitterProfile", 'twitterProfile2.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://twitter.com/billyrestey/status/1723108332591030474?t=jqnZFH3KytAI1zwsOJyU-A&s=19", "render": "html"},
-        "tweet", 'tweet2.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.instagram.com/meehofinds/", "render": "html"},
-        "instagramProfile", 'instagramProfile2.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.instagram.com/p/CzTWqUWLLvJ/", "render": "html"},
-        "instagramPost", 'instagramPost2.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi", "render": "html"},
-        "tiktokProfile", 'tiktokProfile2.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi/video/7298038955348397354", "render": "html"},
-        "tiktokPost", 'tiktokPos2t.html'
-    ),
+    # Pop the specified number of threads from the queue
+    for _ in range(num_threads_to_run):
+        if thread_queue:
+            thread = thread_queue.pop(0)
+            threads_to_run.append(thread)
 
+    # Start and wait for the threads to finish
+    print("\033[92mstarting a new batch\033[0m")
+    for thread in threads_to_run:
+        thread.start()
+        time.sleep(1)
+    for thread in threads_to_run:
+        thread.join()
+    print("\033[92mlast batch finished\033[0m")
 
+# ---------------->starts here<----------------
 
-    create_thread(
-        {"source": "universal", "url": f"https://x.com/CultureCrave{twitterSession}", "render": "html"},
-        "twitterProfile", 'twitterProfile3.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://twitter.com/slave4engfa/status/1723308710582464913?t=r8BkEsWks2IiO7LtS_f9gg&s=19", "render": "html"},
-        "tweet", 'tweet3.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.instagram.com/laurengerman/", "render": "html"},
-        "instagramProfile", 'instagramProfile3.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.instagram.com/p/CzTWqUWLLvJ/", "render": "html"},
-        "instagramPost", 'instagramPost3.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi", "render": "html"},
-        "tiktokProfile", 'tiktokProfile3.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi/video/7298038955348397354", "render": "html"},
-        "tiktokPost", 'tiktokPost3.html'
-    ),
+deleteHtmlFiles()
+
+userLimit = 20 # (1 user has 6 requests or 6 threads)
+usersPerBatch = 10
+threads_per_batch = usersPerBatch * 6
 
 
-    create_thread(
-        {"source": "universal", "url": f"https://x.com/slave4engfa{twitterSession}", "render": "html"},
-        "twitterProfile", 'twitterProfile5.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://x.com/itstrahuna/status/1723186496985874758?t=QzeAE9GPVUoOZpx3uydvdg&s=08", "render": "html"},
-        "tweet", 'tweet5.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://instagram.com/hariniiiiie_?igshid=OGQ5ZDc2ODk2ZA==", "render": "html"},
-        "instagramProfile", 'instagramProfile5.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.instagram.com/p/CzTWqUWLLvJ/", "render": "html"},
-        "instagramPost", 'instagramPost5.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi", "render": "html"},
-        "tiktokProfile", 'tiktokProfile5.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi/video/7298038955348397354", "render": "html"},
-        "tiktokPost", 'tiktokPost5.html'
-    ),
+threads = []
+for user in user_objects[:userLimit]:
+    instagramProfileThread = create_thread(
+        {"source": "universal", "url": user.insta.profileUrl, "render": "html"},
+        'instagram_profile_{}.html'.format(user.fullName)
+    )
+    threads.append(instagramProfileThread)
+
+    instagramPostThread = create_thread(
+        {"source": "universal", "url": user.insta.postUrl, "render": "html"},
+        'instagram_post_{}.html'.format(user.fullName)
+    )
+    threads.append(instagramPostThread)
+
+    tiktokProfileThread = create_thread(
+        {"source": "universal", "url": user.tiktok.profileUrl, "render": "html"},
+        'tiktok_profile_{}.html'.format(user.fullName)
+    )
+    threads.append(tiktokProfileThread)
+
+    tiktokPostThread = create_thread(
+        {"source": "universal", "url": user.tiktok.postUrl, "render": "html"},
+        'tiktok_post_{}.html'.format(user.fullName)
+    )
+    threads.append(tiktokPostThread)
+
+    twitterProfileThread = create_thread(
+        {"source": "universal", "url": user.twitter.profileUrl, "render": "html"},
+        'twitter_profile_{}.html'.format(user.fullName)
+    )
+    threads.append(twitterProfileThread)
+
+    twitterPostThread = create_thread(
+        {"source": "universal", "url": user.twitter.postUrl, "render": "html"},
+        'tweet_{}.html'.format(user.fullName)
+    )
+    threads.append(twitterPostThread)
 
 
-    create_thread(
-        {"source": "universal", "url": f"https://x.com/slave4engfa{twitterSession}", "render": "html"},
-        "twitterProfile", 'twitterProfile4.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://x.com/itstrahuna/status/1723186496985874758?t=QzeAE9GPVUoOZpx3uydvdg&s=08", "render": "html"},
-        "tweet", 'tweet4.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://instagram.com/hariniiiiie_?igshid=OGQ5ZDc2ODk2ZA==", "render": "html"},
-        "instagramProfile", 'instagramProfile4.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.instagram.com/p/CzTWqUWLLvJ/", "render": "html"},
-        "instagramPost", 'instagramPost4.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi", "render": "html"},
-        "tiktokProfile", 'tiktokProfile4.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi/video/7298038955348397354", "render": "html"},
-        "tiktokPost", 'tiktokPost4.html'
-    ),
-
-
-    create_thread(
-        {"source": "universal", "url": f"https://x.com/slave4engfa{twitterSession}", "render": "html"},
-        "twitterProfile", 'twitterProfile6.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://x.com/itstrahuna/status/1723186496985874758?t=QzeAE9GPVUoOZpx3uydvdg&s=08", "render": "html"},
-        "tweet", 'tweet6.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://instagram.com/hariniiiiie_?igshid=OGQ5ZDc2ODk2ZA==", "render": "html"},
-        "instagramProfile", 'instagramProfile6.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.instagram.com/p/CzTWqUWLLvJ/", "render": "html"},
-        "instagramPost", 'instagramPost6.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi", "render": "html"},
-        "tiktokProfile", 'tiktokProfile6.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi/video/7298038955348397354", "render": "html"},
-        "tiktokPost", 'tiktokPost6.html'
-    ),
-
-
-    create_thread(
-        {"source": "universal", "url": f"https://x.com/slave4engfa{twitterSession}", "render": "html"},
-        "twitterProfile", 'twitterProfile7.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://x.com/itstrahuna/status/1723186496985874758?t=QzeAE9GPVUoOZpx3uydvdg&s=08", "render": "html"},
-        "tweet", 'tweet7.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://instagram.com/hariniiiiie_?igshid=OGQ5ZDc2ODk2ZA==", "render": "html"},
-        "instagramProfile", 'instagramProfile7.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.instagram.com/p/CzTWqUWLLvJ/", "render": "html"},
-        "instagramPost", 'instagramPost7.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi", "render": "html"},
-        "tiktokProfile", 'tiktokProfile7.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi/video/7298038955348397354", "render": "html"},
-        "tiktokPost", 'tiktokPost7.html'
-    ),
-
-
-    create_thread(
-        {"source": "universal", "url": f"https://x.com/slave4engfa{twitterSession}", "render": "html"},
-        "twitterProfile", 'twitterProfile8.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://x.com/itstrahuna/status/1723186496985874758?t=QzeAE9GPVUoOZpx3uydvdg&s=08", "render": "html"},
-        "tweet", 'tweet8.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://instagram.com/hariniiiiie_?igshid=OGQ5ZDc2ODk2ZA==", "render": "html"},
-        "instagramProfile", 'instagramProfile8.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.instagram.com/p/CzTWqUWLLvJ/", "render": "html"},
-        "instagramPost", 'instagramPost8.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi", "render": "html"},
-        "tiktokProfile", 'tiktokProfile8.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi/video/7298038955348397354", "render": "html"},
-        "tiktokPost", 'tiktokPost8.html'
-    ),
-
-
-    create_thread(
-        {"source": "universal", "url": f"https://x.com/slave4engfa{twitterSession}", "render": "html"},
-        "twitterProfile", 'twitterProfile9.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://x.com/itstrahuna/status/1723186496985874758?t=QzeAE9GPVUoOZpx3uydvdg&s=08", "render": "html"},
-        "tweet", 'tweet9.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://instagram.com/hariniiiiie_?igshid=OGQ5ZDc2ODk2ZA==", "render": "html"},
-        "instagramProfile", 'instagramProfile9.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.instagram.com/p/CzTWqUWLLvJ/", "render": "html"},
-        "instagramPost", 'instagramPost9.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi", "render": "html"},
-        "tiktokProfile", 'tiktokProfile9.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi/video/7298038955348397354", "render": "html"},
-        "tiktokPost", 'tiktokPost9.html'
-    ),
-
-
-    create_thread(
-        {"source": "universal", "url": f"https://x.com/slave4engfa{twitterSession}", "render": "html"},
-        "twitterProfile", 'twitterProfile10.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://x.com/itstrahuna/status/1723186496985874758?t=QzeAE9GPVUoOZpx3uydvdg&s=08", "render": "html"},
-        "tweet", 'tweet10.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://instagram.com/hariniiiiie_?igshid=OGQ5ZDc2ODk2ZA==", "render": "html"},
-        "instagramProfile", 'instagramProfile10.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.instagram.com/p/CzTWqUWLLvJ/", "render": "html"},
-        "instagramPost", 'instagramPost10.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi", "render": "html"},
-        "tiktokProfile", 'tiktokProfile10.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi/video/7298038955348397354", "render": "html"},
-        "tiktokPost", 'tiktokPost10.html'
-    ),
-
-
-    create_thread(
-        {"source": "universal", "url": f"https://x.com/slave4engfa{twitterSession}", "render": "html"},
-        "twitterProfile", 'twitterProfile11.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://x.com/itstrahuna/status/1723186496985874758?t=QzeAE9GPVUoOZpx3uydvdg&s=08", "render": "html"},
-        "tweet", 'tweet11.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://instagram.com/hariniiiiie_?igshid=OGQ5ZDc2ODk2ZA==", "render": "html"},
-        "instagramProfile", 'instagramProfile11.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.instagram.com/p/CzTWqUWLLvJ/", "render": "html"},
-        "instagramPost", 'instagramPost11.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi", "render": "html"},
-        "tiktokProfile", 'tiktokProfile11.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi/video/7298038955348397354", "render": "html"},
-        "tiktokPost", 'tiktokPost11.html'
-    ),
-
-
-
-    create_thread(
-        {"source": "universal", "url": f"https://x.com/slave4engfa{twitterSession}", "render": "html"},
-        "twitterProfile", 'twitterProfile12.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://x.com/itstrahuna/status/1723186496985874758?t=QzeAE9GPVUoOZpx3uydvdg&s=08", "render": "html"},
-        "tweet", 'tweet12.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://instagram.com/hariniiiiie_?igshid=OGQ5ZDc2ODk2ZA==", "render": "html"},
-        "instagramProfile", 'instagramProfile12.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.instagram.com/p/CzTWqUWLLvJ/", "render": "html"},
-        "instagramPost", 'instagramPost12.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi", "render": "html"},
-        "tiktokProfile", 'tiktokProfile12.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi/video/7298038955348397354", "render": "html"},
-        "tiktokPost", 'tiktokPost12.html'
-    ),
-
-
-    create_thread(
-        {"source": "universal", "url": f"https://x.com/slave4engfa{twitterSession}", "render": "html"},
-        "twitterProfile", 'twitterProfile13.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://x.com/itstrahuna/status/1723186496985874758?t=QzeAE9GPVUoOZpx3uydvdg&s=08", "render": "html"},
-        "tweet", 'tweet13.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://instagram.com/hariniiiiie_?igshid=OGQ5ZDc2ODk2ZA==", "render": "html"},
-        "instagramProfile", 'instagramProfile13.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.instagram.com/p/CzTWqUWLLvJ/", "render": "html"},
-        "instagramPost", 'instagramPost13.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi", "render": "html"},
-        "tiktokProfile", 'tiktokProfile13.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi/video/7298038955348397354", "render": "html"},
-        "tiktokPost", 'tiktokPost13.html'
-    ),
-
-
-    create_thread(
-        {"source": "universal", "url": f"https://x.com/slave4engfa{twitterSession}", "render": "html"},
-        "twitterProfile", 'twitterProfile14.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://x.com/itstrahuna/status/1723186496985874758?t=QzeAE9GPVUoOZpx3uydvdg&s=08", "render": "html"},
-        "tweet", 'tweet14.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://instagram.com/hariniiiiie_?igshid=OGQ5ZDc2ODk2ZA==", "render": "html"},
-        "instagramProfile", 'instagramProfile14.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.instagram.com/p/CzTWqUWLLvJ/", "render": "html"},
-        "instagramPost", 'instagramPost14.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi", "render": "html"},
-        "tiktokProfile", 'tiktokProfile14.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi/video/7298038955348397354", "render": "html"},
-        "tiktokPost", 'tiktokPost14.html'
-    ),
-
-
-
-    create_thread(
-        {"source": "universal", "url": f"https://x.com/slave4engfa{twitterSession}", "render": "html"},
-        "twitterProfile", 'twitterProfile15.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://x.com/itstrahuna/status/1723186496985874758?t=QzeAE9GPVUoOZpx3uydvdg&s=08", "render": "html"},
-        "tweet", 'tweet15.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://instagram.com/hariniiiiie_?igshid=OGQ5ZDc2ODk2ZA==", "render": "html"},
-        "instagramProfile", 'instagramProfile15.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.instagram.com/p/CzTWqUWLLvJ/", "render": "html"},
-        "instagramPost", 'instagramPost15.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi", "render": "html"},
-        "tiktokProfile", 'tiktokProfile15.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi/video/7298038955348397354", "render": "html"},
-        "tiktokPost", 'tiktokPost15.html'
-    ),
-
-
-    create_thread(
-        {"source": "universal", "url": f"https://x.com/slave4engfa{twitterSession}", "render": "html"},
-        "twitterProfile", 'twitterProfile16.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://x.com/itstrahuna/status/1723186496985874758?t=QzeAE9GPVUoOZpx3uydvdg&s=08", "render": "html"},
-        "tweet", 'tweet16.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://instagram.com/hariniiiiie_?igshid=OGQ5ZDc2ODk2ZA==", "render": "html"},
-        "instagramProfile", 'instagramProfile16.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.instagram.com/p/CzTWqUWLLvJ/", "render": "html"},
-        "instagramPost", 'instagramPost16.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi", "render": "html"},
-        "tiktokProfile", 'tiktokProfile16.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi/video/7298038955348397354", "render": "html"},
-        "tiktokPost", 'tiktokPost16.html'
-    ),
-
-
-    create_thread(
-        {"source": "universal", "url": f"https://x.com/slave4engfa{twitterSession}", "render": "html"},
-        "twitterProfile", 'twitterProfile17.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://x.com/itstrahuna/status/1723186496985874758?t=QzeAE9GPVUoOZpx3uydvdg&s=08", "render": "html"},
-        "tweet", 'tweet17.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://instagram.com/hariniiiiie_?igshid=OGQ5ZDc2ODk2ZA==", "render": "html"},
-        "instagramProfile", 'instagramProfile17.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.instagram.com/p/CzTWqUWLLvJ/", "render": "html"},
-        "instagramPost", 'instagramPost17.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi", "render": "html"},
-        "tiktokProfile", 'tiktokProfile17.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi/video/7298038955348397354", "render": "html"},
-        "tiktokPost", 'tiktokPost17.html'
-    ),
-
-
-    create_thread(
-        {"source": "universal", "url": f"https://x.com/slave4engfa{twitterSession}", "render": "html"},
-        "twitterProfile", 'twitterProfile18.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://x.com/itstrahuna/status/1723186496985874758?t=QzeAE9GPVUoOZpx3uydvdg&s=08", "render": "html"},
-        "tweet", 'tweet18.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://instagram.com/hariniiiiie_?igshid=OGQ5ZDc2ODk2ZA==", "render": "html"},
-        "instagramProfile", 'instagramProfile18.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.instagram.com/p/CzTWqUWLLvJ/", "render": "html"},
-        "instagramPost", 'instagramPost18.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi", "render": "html"},
-        "tiktokProfile", 'tiktokProfile18.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi/video/7298038955348397354", "render": "html"},
-        "tiktokPost", 'tiktokPost18.html'
-    ),
-
-
-    create_thread(
-        {"source": "universal", "url": f"https://x.com/slave4engfa{twitterSession}", "render": "html"},
-        "twitterProfile", 'twitterProfile19.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://x.com/itstrahuna/status/1723186496985874758?t=QzeAE9GPVUoOZpx3uydvdg&s=08", "render": "html"},
-        "tweet", 'tweet19.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://instagram.com/hariniiiiie_?igshid=OGQ5ZDc2ODk2ZA==", "render": "html"},
-        "instagramProfile", 'instagramProfile19.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.instagram.com/p/CzTWqUWLLvJ/", "render": "html"},
-        "instagramPost", 'instagramPost19.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi", "render": "html"},
-        "tiktokProfile", 'tiktokProfile19.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi/video/7298038955348397354", "render": "html"},
-        "tiktokPost", 'tiktokPost19.html'
-    ),
-
-
-
-    create_thread(
-        {"source": "universal", "url": f"https://x.com/slave4engfa{twitterSession}", "render": "html"},
-        "twitterProfile", 'twitterProfile20.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://x.com/itstrahuna/status/1723186496985874758?t=QzeAE9GPVUoOZpx3uydvdg&s=08", "render": "html"},
-        "tweet", 'tweet20.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://instagram.com/hariniiiiie_?igshid=OGQ5ZDc2ODk2ZA==", "render": "html"},
-        "instagramProfile", 'instagramProfile20.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.instagram.com/p/CzTWqUWLLvJ/", "render": "html"},
-        "instagramPost", 'instagramPost20.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi", "render": "html"},
-        "tiktokProfile", 'tiktokProfile20.html'
-    ),
-    create_thread(
-        {"source": "universal", "url": "https://www.tiktok.com/@thezachchoi/video/7298038955348397354", "render": "html"},
-        "tiktokPost", 'tiktokPost20.html'
-    ),
-
-
-
-]
-
-# Wait for all threads to finish
-for thread in threads:
-    thread.join()
+while threads:
+    run_threads(threads, threads_per_batch)
