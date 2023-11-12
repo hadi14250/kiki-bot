@@ -160,7 +160,7 @@ cython_debug/
 #.idea/
 
 #test file
-# *.html
+*.html
 
 #log file
 *.log
