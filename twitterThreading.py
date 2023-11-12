@@ -25,7 +25,7 @@ def printHtml(content, filename, dirName):
 
     filename = os.path.join(dirName, filename)
 
-    with open(filename, 'wb') as f:
+    with open(filename, 'w', encoding='utf-8') as f:
         f.write(content)
 
 def create_thread(payload, filename):
@@ -42,7 +42,7 @@ def make_request(payload, filename, retry_attempts=3, retry_delay=5):
                 json=payload,
             )
             response.raise_for_status()
-            printHtml( response.content, filename, "htmlFiles")
+            printHtml( response.text, filename, "htmlFiles")
             break  # Successful request, exit the loop
         except (ConnectionError, HTTPError, Timeout, TooManyRedirects, SSLError, RequestException) as e:
             print(f"An error occurred: {e}")
@@ -76,7 +76,7 @@ def run_threads(thread_queue, num_threads_to_run):
 
 deleteHtmlFiles()
 
-userLimit = 50 # (1 user has 6 requests or 6 threads)
+userLimit = 1 # (1 user has 6 requests or 6 threads)
 usersPerBatch = 15
 
 threads_per_batch = usersPerBatch * 6

@@ -4,5 +4,7 @@ run the below command:
 clear ; rm *.html ; time python3 kiki.py
 
 tasks
-add more exceptions to the request methods
-look into xml parsing
+
+add retry if you dint find what you're looking for in the response
+
+add verifications for each url
