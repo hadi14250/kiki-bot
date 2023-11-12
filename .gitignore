@@ -167,3 +167,5 @@ cython_debug/
 
 #env variable
 *.env
+
+.xlsx
