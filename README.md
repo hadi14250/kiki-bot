@@ -10,3 +10,5 @@ add retry if you dint find what you're looking for in the response
 add verifications for each url
 
 read more in the documentation of oxylabs, there must be something usefull there
+
+try scraping an insta post url with a private account

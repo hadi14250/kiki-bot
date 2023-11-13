@@ -1,8 +1,4 @@
 from bs4 import BeautifulSoup
-import requests
-import urllib.request
-
-url = "https://instagram.com/pubity/"
 
 def getting_parsa_data(i):
     data = {}
@@ -16,7 +12,13 @@ def getting_parsa_data(i):
     data["posts"] = i[5]
     return data
 
-def getting_scrape_data(htmlText):
+def getting_scrape_data_insta_profile(htmlText):
     i = BeautifulSoup(htmlText, "html.parser")
     meta = i.find("meta", property="og:description")
     return getting_parsa_data(meta.attrs['content'])
+
+def getting_scrape_data_insta_post(htmlText):
+    i = BeautifulSoup(htmlText, "html.parser")
+    meta = i.find("meta", property="og:description")
+    return getting_parsa_data(meta.attrs['content'])
+

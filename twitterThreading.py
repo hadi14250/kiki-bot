@@ -5,7 +5,8 @@ from requests.exceptions import RequestException, ConnectionError, HTTPError, Ti
 import glob
 import os
 from user import User, user_objects
-
+from insta import getting_scrape_data
+from formatHtml import formatHtml, printInstagramInfo
 
 def deleteHtmlFiles():
     curentDir = os.getcwd()
@@ -19,39 +20,44 @@ def deleteHtmlFiles():
     for file in html_files:
         os.remove(file)
 
-def printHtml(content, filename, dirName):
+def printHtml(rawResponseText, filename, dirName):
     if not os.path.exists(dirName):
         os.makedirs(dirName)
 
     filename = os.path.join(dirName, filename)
 
     with open(filename, 'w', encoding='utf-8') as f:
-        f.write(content)
+        formattedHtml = formatHtml(rawResponseText)
+        f.write(formattedHtml)
 
 def create_thread(payload, filename):
     thread = threading.Thread(target=make_request, args=(payload, filename))
     return thread
 
 def make_request(payload, filename, retry_attempts=3, retry_delay=5):
-     for attempt in range(retry_attempts):   
-        try:
-            response = requests.request(
+	# headers = {
+	# 	"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36",
+	# 	# Add other headers if needed
+	# }
+	for attempt in range(retry_attempts):   
+		try:
+			response = requests.request(
                 'POST',
                 'https://realtime.oxylabs.io/v1/queries',
+                # headers=headers,
                 auth=('hadi14250', '!SrJY8SUHSYp8nB'),
                 json=payload,
             )
-            response.raise_for_status()
-            printHtml( response.text, filename, "htmlFiles")
-            break  # Successful request, exit the loop
-        except (ConnectionError, HTTPError, Timeout, TooManyRedirects, SSLError, RequestException) as e:
-            print(f"An error occurred: {e}")
-            if attempt < retry_attempts - 1:
-                print(f"Retry Number {attempt + 1} for {filename} in {retry_delay} seconds...")
-                time.sleep(retry_delay)
-                # make_request
-            else:
-                print(f"\033[91mMax retries reached. Request failed for {filename}\033[0m")
+			response.raise_for_status()
+			printHtml( response.text, filename, "htmlFiles")
+			break  # Successful request, exit the loop
+		except (ConnectionError, HTTPError, Timeout, TooManyRedirects, SSLError, RequestException) as e:
+			print(f"An error occurred: {e}")
+			if attempt < retry_attempts - 1:
+				print(f"Retry Number {attempt + 1} for {filename} in {retry_delay} seconds...")
+				time.sleep(retry_delay)
+			else:
+				print(f"\033[91mMax retries reached. Request failed for {filename}\033[0m")
 
 
 def run_threads(thread_queue, num_threads_to_run):
@@ -76,8 +82,8 @@ def run_threads(thread_queue, num_threads_to_run):
 
 deleteHtmlFiles()
 
-userLimit = 30 # (1 user has 6 requests or 6 threads)
-usersPerBatch = 15
+userLimit = 50 # (1 user has 6 requests or 6 threads)
+usersPerBatch = 25
 
 threads_per_batch = usersPerBatch * 6
 
