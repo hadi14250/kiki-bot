@@ -1,5 +1,5 @@
 import re
-from insta import getting_scrape_data
+from insta import getting_scrape_data_insta_post
 
 def formatHtml(rawHtml):
 	rawHtml = rawHtml.replace("\\n", "\n").replace("\\", "")

@@ -5,7 +5,7 @@ from requests.exceptions import RequestException, ConnectionError, HTTPError, Ti
 import glob
 import os
 from user import User, user_objects
-from insta import getting_scrape_data
+from insta import getting_scrape_data_insta_post
 from formatHtml import formatHtml, printInstagramInfo
 
 def deleteHtmlFiles():
@@ -82,7 +82,7 @@ def run_threads(thread_queue, num_threads_to_run):
 
 deleteHtmlFiles()
 
-userLimit = 50 # (1 user has 6 requests or 6 threads)
+userLimit = 10 # (1 user has 6 requests or 6 threads)
 usersPerBatch = 25
 
 threads_per_batch = usersPerBatch * 6

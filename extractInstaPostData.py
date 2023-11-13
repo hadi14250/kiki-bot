@@ -1,0 +1,122 @@
+from bs4 import BeautifulSoup
+import os
+import time
+import html
+import re
+from datetime import datetime
+
+def extractInstagramLikeCount(input_string):
+    # Check for the presence of "likes" in the input string
+    if "likes" not in input_string.lower():
+        return 0
+
+    # Define a regular expression pattern to match different formats of like counts
+    pattern = re.compile(r'(\d{1,3}(?:,\d{3})*(?:\.\d+)?)\s*(K|k|M|m)?', re.IGNORECASE)
+
+    # Search for the pattern in the input string
+    match = pattern.search(input_string)
+
+    if match:
+        # Extract and normalize the like count
+        like_count = match.group(1).replace(',', '')
+        unit = match.group(2)
+
+        if '.' in like_count:
+            # If decimal part is present, convert to integer after multiplying with the appropriate factor
+            like_count = str(int(float(like_count) * (1000 if unit.lower() == 'k' else 1000000)))
+        else:
+            # If no decimal part, multiply with 'K' or 'M' accordingly
+            if unit and unit.lower() == 'k':
+                like_count = str(int(like_count) * 1000)
+            elif unit and unit.lower() == 'm':
+                like_count = str(int(like_count) * 1000000)
+
+        return int(like_count)
+    else:
+        return 0  # Return None if there is no match
+
+def formatInput(input_string):
+    # Extract the part of the input string up to the date
+    formatted_input = re.search(r'(.+?(\d{1,2}, \d{4}):)', input_string).group(1).strip()
+    return formatted_input
+
+def extractInstagramUsername(input_string):
+    # Define a regular expression pattern to match the username
+    pattern = re.compile(r'\s*-\s*([\w_]+)\s*on', re.IGNORECASE)
+
+    # Search for the pattern in the input string
+    match = pattern.search(input_string)
+
+    if match:
+        # Extract the username
+        username = match.group(1)
+        return username
+    else:
+        return None
+
+def extractInstagramDate(input_string):
+    # Define a date format that matches the date pattern in your input string
+	date_format = "%B %d, %Y"
+
+    # Split the input string to extract the date part
+	date_part = input_string.split('on')[-1].strip()
+    
+	# Remove the trailing colon, if present
+	date_part = date_part.rstrip(':')
+
+	try:
+		# Parse the date using the specified format
+		date_object = datetime.strptime(date_part, date_format).date()
+		return date_object
+	except ValueError:
+        # Handle the case where the date cannot be parsed
+		return None
+
+# replace "type"  with "likesCount" for likes
+# or with "userName" for instagram username
+# or with "postDate" for date of the post
+def	extractInstaPostData(inputString, type):
+	i = BeautifulSoup(file_content, "html.parser")
+	meta = i.find("meta", property="og:description")
+	meta_content = meta.get("content") if meta else ""
+	formatted_content = formatInput(meta_content)
+
+	if (type == "likeCount"):
+		return (extractInstagramLikeCount(formatted_content))
+	elif (type == "userName"):
+		return (extractInstagramUsername(formatted_content))
+	elif (type == "postDate"):
+		return (extractInstagramDate(formatted_content))
+
+
+
+
+# ----------->	below code os for testing purposes	<------------
+
+directory_path = "instagramPostsHtmlFile"  # Replace with your actual directory path
+
+# List all files in the directory
+file_list = os.listdir(directory_path)
+
+# Loop through each file and read its content
+for file_name in file_list:
+	file_path = os.path.join(directory_path, file_name)
+    # Check if it's a file (not a directory)
+	if os.path.isfile(file_path):
+		with open(file_path, "r", encoding="utf-8") as file:
+			file_content = file.read()
+			i = BeautifulSoup(file_content, "html.parser")
+			# meta = i.find("meta", property="og:title")
+			meta = i.find("meta", property="og:description")
+			meta_content = meta.get("content") if meta else ""
+			formatted_content = formatInput(meta_content)
+			print("username",
+				"\"{}\"".format(extractInstaPostData(file_content, "userName")),
+                "has:", 
+                extractInstaPostData(file_content, "likeCount"),
+                "likes",
+                "on Date",
+                extractInstaPostData(file_content, "postDate"))
+			print("\n-----------\n", formatted_content, "\n\n-----------\n\n\n")
+            
+
