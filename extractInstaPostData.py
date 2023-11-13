@@ -35,10 +35,19 @@ def extractInstagramLikeCount(input_string):
     else:
         return 0  # Return None if there is no match
 
+#The regular expression (.*?) will capture everything up
+# to the date pattern, and (\d{1,2}, \d{4}) will capture
+# the date "November 5, 2023". The colon : is also included.
 def formatInput(input_string):
-    # Extract the part of the input string up to the date
-    formatted_input = re.search(r'(.+?(\d{1,2}, \d{4}):)', input_string).group(1).strip()
-    return formatted_input
+    match = re.search(r'(.+?(\d{1,2}, \d{4}):)', input_string)
+
+    if match:
+        # If a match is found, return the formatted input
+        formatted_input = match.group(1).strip()
+        return formatted_input
+    else:
+        # If no match is found, return the original input
+        return input_string.strip()
 
 def extractInstagramUsername(input_string):
     # Define a regular expression pattern to match the username
@@ -72,21 +81,55 @@ def extractInstagramDate(input_string):
         # Handle the case where the date cannot be parsed
 		return None
 
+# removes "username on Instagram" text from the title tag to give the raw
+# text of the post.
+def extractInstagramContent(input_string):
+    # Find the index of "on Instagram: " in the input string
+    start_index = input_string.find('on Instagram: ')
+    
+    if start_index != -1:
+        # Extract the substring starting from the end of "on Instagram: "
+        substring = input_string[start_index + len('on Instagram: '):]
+        
+        # Check if the substring contains quotes
+        if '"' in substring:
+            # Find the index of the first quote
+            quote_start_index = substring.find('"')
+            
+            # Find the index of the second quote, starting from the position after the first quote
+            quote_end_index = substring.find('"', quote_start_index + 1)
+            
+            # Extract the content within the quotes
+            content = substring[quote_start_index + 1:quote_end_index]
+            return content.strip()
+
+    return None
+
+
 # replace "type"  with "likesCount" for likes
 # or with "userName" for instagram username
 # or with "postDate" for date of the post
 def	extractInstaPostData(inputString, type):
-	i = BeautifulSoup(file_content, "html.parser")
-	meta = i.find("meta", property="og:description")
-	meta_content = meta.get("content") if meta else ""
-	formatted_content = formatInput(meta_content)
+
+	soup = BeautifulSoup(inputString, "html.parser")
+
+	# extracting meta html tag with the "og:description" property
+	metaDesc = soup.find("meta", property="og:description")
+	metaDescContent = metaDesc.get("content") if metaDesc else ""
+	formattedMetaDescContent = formatInput(metaDescContent)
+
+	# extracting meta html tag with the "og:title" property
+	metaTitle = soup.find("meta", property="og:title")
+	metaTitleContent = metaTitle.get("content") if metaTitle else ""
 
 	if (type == "likeCount"):
-		return (extractInstagramLikeCount(formatted_content))
+		return (extractInstagramLikeCount(formattedMetaDescContent))
 	elif (type == "userName"):
-		return (extractInstagramUsername(formatted_content))
+		return (extractInstagramUsername(formattedMetaDescContent))
 	elif (type == "postDate"):
-		return (extractInstagramDate(formatted_content))
+		return (extractInstagramDate(formattedMetaDescContent))
+	elif (type == "content"):
+		return (extractInstagramContent(metaTitleContent))
 
 
 
@@ -98,25 +141,34 @@ directory_path = "instagramPostsHtmlFile"  # Replace with your actual directory 
 # List all files in the directory
 file_list = os.listdir(directory_path)
 
+counter = 1
+
 # Loop through each file and read its content
 for file_name in file_list:
 	file_path = os.path.join(directory_path, file_name)
     # Check if it's a file (not a directory)
 	if os.path.isfile(file_path):
-		with open(file_path, "r", encoding="utf-8") as file:
+		with open(file_path, "r", encoding="utf-8", errors="replace") as file:
 			file_content = file.read()
 			i = BeautifulSoup(file_content, "html.parser")
 			# meta = i.find("meta", property="og:title")
 			meta = i.find("meta", property="og:description")
 			meta_content = meta.get("content") if meta else ""
 			formatted_content = formatInput(meta_content)
-			print("username",
+
+			print("\n--------------------------------- {}\n Original Content\n".format(counter),
+				formatted_content,
+				"\n---------------------------------\n")
+
+			print("---------->\nusername",
 				"\"{}\"".format(extractInstaPostData(file_content, "userName")),
                 "has:", 
                 extractInstaPostData(file_content, "likeCount"),
                 "likes",
                 "on Date",
-                extractInstaPostData(file_content, "postDate"))
-			print("\n-----------\n", formatted_content, "\n\n-----------\n\n\n")
+                extractInstaPostData(file_content, "postDate"),
+                f"-----> {extractInstaPostData(file_content, 'content')} <-----",
+                "\n<----------")
+	counter += 1
             
 
