@@ -8,6 +8,7 @@ from user import user, user_objects
 from extractInstaProfileData import getInstaFollowers
 from formatHtml import formatHtml
 from getCredentials import getProxyUsername, getProxyPassword
+from extractInstaPostData import extractInstaPostData
 
 def deleteHtmlFiles():
     curentDir = os.getcwd()
@@ -81,7 +82,7 @@ def run_threads(thread_queue, num_threads_to_run):
 
 deleteHtmlFiles()
 
-userLimit = 5 # (1 user has 6 requests or 6 threads)
+userLimit = 1 # (1 user has 6 requests or 6 threads)
 usersPerBatch = 50
 
 threads_per_batch = usersPerBatch * 6
@@ -152,5 +153,12 @@ while threads:
     run_threads(threads, threads_per_batch)
 
 
-# for user in user_objects[:userLimit]:
-	# user.instaProfile.followers = getInstaFollowers()
+for user in user_objects[:userLimit]:
+	user.instaProfile.followers = getInstaFollowers(user.instaProfile.soupHtml)
+	user.instaPost.excractedUserName = extractInstaPostData(user.instaPost.html, "userName")
+	user.instaPost.postLike = extractInstaPostData(user.instaPost.html, "likeCount")
+	user.instaPost.postText = extractInstaPostData(user.instaPost.html, "content")
+	user.instaPost.postDate = extractInstaPostData(user.instaPost.html, "postDate")
+	print("Username: {} has {} followers, on his {} post he has {} likes. content is \n----------->\n{}\n<-----------\n\n\n".format(
+          user.instaProfile.csvUserName, user.instaProfile.followers,
+        	user.instaPost.postDate, user.instaPost.postLike, user.instaPost.postText))

@@ -1,4 +1,3 @@
-from bs4 import BeautifulSoup
 import os
 
 def getting_parse_data(i):
@@ -6,11 +5,10 @@ def getting_parse_data(i):
 	i = i.split(" ")
 	return (i[0])
 
-def getInstaFollowers(htmlText):
-	if not (htmlText):
+def getInstaFollowers(soupHtml):
+	if not (soupHtml):
 		return (None)
-	i = BeautifulSoup(htmlText, "html.parser")
-	meta = i.find("meta", property="og:description")
+	meta = soupHtml.find("meta", property="og:description")
 	return getting_parse_data(meta.attrs['content'])
 
 

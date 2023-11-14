@@ -35,18 +35,17 @@ def extractInstagramLikeCount(input_string):
         return 0  # Return None if there is no match
 
 def extractInstagramUsername(input_string):
-    # Define a regular expression pattern to match the username
-    pattern = re.compile(r'\s*-\s*([\w_]+)\s*on', re.IGNORECASE)
+	# Define a regular expression pattern to match the username
+	pattern = re.compile(r'\s*-\s*([\w_]+)\s*on', re.IGNORECASE)
 
     # Search for the pattern in the input string
-    match = pattern.search(input_string)
-
-    if match:
-        # Extract the username
-        username = match.group(1)
-        return username
-    else:
-        return None
+	match = pattern.search(input_string)
+	if match:
+		# Extract the username
+		username = match.group(1)
+		return username
+	else:
+		return None
 
 def extractInstagramDate(input_string):
     # Define a date format that matches the date pattern in your input string

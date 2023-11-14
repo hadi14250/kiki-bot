@@ -2,6 +2,8 @@ import re
 from extractInstaProfileData import getInstaFollowers
 
 def formatHtml(rawHtml):
+	if not (rawHtml):
+		return (None)
 	rawHtml = rawHtml.replace("\\n", "\n").replace("\\", "")
 	start_pattern = re.compile(r'<html[^>]*>')
 	end_pattern = re.compile(r'</html>')

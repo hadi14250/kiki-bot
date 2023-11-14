@@ -6,6 +6,7 @@ from constructUrls import constructInstagramUrl, constructTiktokUrl, constructTw
 from extractInstaProfileData import getInstaFollowers
 from extractInstaPostData import extractInstaPostData
 from formatHtml import formatHtml
+from bs4 import BeautifulSoup
 
 def get_program_path():
     # Get the path to the currently running Python script
@@ -26,6 +27,7 @@ class SocialMediaProfile:
 		self.profileUrl			= None
 		self.response			= None
 		self.html				= None
+		self.soupHtml			= None
 		self.followers 			= 0
 		self.registerDate		= None
 
@@ -35,6 +37,8 @@ class SocialMediaProfile:
 	def	formatHtmlResponse(self, response):
 		self.response = response
 		self.html = formatHtml(response.text)
+		if (self.html):
+			self.soupHtml = BeautifulSoup(self.html, "html.parser")
 
 
 class SocialMediaPost:
@@ -42,6 +46,7 @@ class SocialMediaPost:
 		self.postUrl 			= post_url
 		self.response			= None
 		self.html				= None
+		self.soupHtml			= None
 		self.excractedUserName	= None
 		self.postLike			= 0
 		self.postText			= None
@@ -59,8 +64,8 @@ class SocialMediaPost:
 	def	formatHtmlResponse(self, response):
 		self.response = response
 		self.html = formatHtml(response.text)
-
-
+		if (self.html):
+			self.soupHtml = BeautifulSoup(self.html, "html.parser")
 
 
 class User:
