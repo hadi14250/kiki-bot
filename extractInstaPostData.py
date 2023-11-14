@@ -1,7 +1,6 @@
 from bs4 import BeautifulSoup
 import os
 import time
-import html
 import re
 from datetime import datetime
 
@@ -109,9 +108,9 @@ def formatInput(input_string):
 # replace "type"  with "likesCount" for likes
 # or with "userName" for instagram username
 # or with "postDate" for date of the post
-def	extractInstaPostData(inputString, type):
+def	extractInstaPostData(htmlResponse, type):
 
-	soup = BeautifulSoup(inputString, "html.parser")
+	soup = BeautifulSoup(htmlResponse, "html.parser")
 
 	# extracting meta html tag with the "og:description" property
 	metaDesc = soup.find("meta", property="og:description")
@@ -122,53 +121,43 @@ def	extractInstaPostData(inputString, type):
 	metaTitle = soup.find("meta", property="og:title")
 	metaTitleContent = metaTitle.get("content") if metaTitle else ""
 
-	if (type == "likeCount"):
-		return (extractInstagramLikeCount(formattedMetaDescContent))
-	elif (type == "userName"):
+	if (type == "userName"):
 		return (extractInstagramUsername(formattedMetaDescContent))
-	elif (type == "postDate"):
-		return (extractInstagramDate(formattedMetaDescContent))
+	elif (type == "likeCount"):
+		return (extractInstagramLikeCount(formattedMetaDescContent))
 	elif (type == "content"):
 		return (extractInstagramContent(metaTitleContent))
+	elif (type == "postDate"):
+		return (extractInstagramDate(formattedMetaDescContent))
 
 
 
 
 # ----------->	below code os for testing purposes	<------------
 
-directory_path = "instagramPostsHtmlFile"  # Replace with your actual directory path
+# directory_path = "instagramPostsHtmlFile"  # Replace with your actual directory path
 
-# List all files in the directory
-file_list = os.listdir(directory_path)
+# # List all files in the directory
+# file_list = os.listdir(directory_path)
 
-counter = 1
+# counter = 1
 
-# Loop through each file and read its content
-for file_name in file_list:
-	file_path = os.path.join(directory_path, file_name)
-    # Check if it's a file (not a directory)
-	if os.path.isfile(file_path):
-		with open(file_path, "r", encoding="utf-8", errors="replace") as file:
-			file_content = file.read()
-			i = BeautifulSoup(file_content, "html.parser")
-			# meta = i.find("meta", property="og:title")
-			meta = i.find("meta", property="og:description")
-			meta_content = meta.get("content") if meta else ""
-			formatted_content = formatInput(meta_content)
-
-			print("\n--------------------------------- {}\n Original Content\n".format(counter),
-				formatted_content,
-				"\n---------------------------------\n")
-
-			print("---------->\nusername",
-				"\"{}\"".format(extractInstaPostData(file_content, "userName")),
-                "has:", 
-                extractInstaPostData(file_content, "likeCount"),
-                "likes",
-                "on Date",
-                extractInstaPostData(file_content, "postDate"),
-                f"-----> {extractInstaPostData(file_content, 'content')} <-----",
-                "\n<----------")
-	counter += 1
+# # Loop through each file and read its content
+# for file_name in file_list:
+# 	file_path = os.path.join(directory_path, file_name)
+#     # Check if it's a file (not a directory)
+# 	if os.path.isfile(file_path):
+# 		with open(file_path, "r", encoding="utf-8", errors="replace") as file:
+# 			file_content = file.read()
+# 			print("----------> ((->{}<-))\nusername".format(counter),
+# 				"\"[[[[[[{}]]]]]]\"".format(extractInstaPostData(file_content, "userName")),
+#                 "has:", 
+#                 extractInstaPostData(file_content, "likeCount"),
+#                 "likes",
+#                 "on Date",
+#                 extractInstaPostData(file_content, "postDate"),
+#                 f"-----> [[[[[[{extractInstaPostData(file_content, 'content')}]]]]]] <-----",
+#                 "\n<----------")
+# 	counter += 1
             
 

@@ -1,5 +1,5 @@
 import re
-from extractInstaProfileData import getting_scrape_data_insta_profile
+from extractInstaProfileData import getInstaFollowers
 
 def formatHtml(rawHtml):
 	rawHtml = rawHtml.replace("\\n", "\n").replace("\\", "")
@@ -19,7 +19,7 @@ def formatHtml(rawHtml):
 def	printInstagramInfo(htmlText):
 	if __name__ == "__main__":
 		try:
-			data = getting_scrape_data(htmlText)
+			data = getInstaFollowers(htmlText)
 			print(f"Hadi has", data["Followers"], data["followers"])
 			print(f"Hadi has", data["Following"], data["following"])
 			print(f"Hadi has", data["Posts"], data["posts"])

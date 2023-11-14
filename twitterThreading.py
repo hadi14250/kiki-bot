@@ -4,9 +4,9 @@ import threading
 from requests.exceptions import RequestException, ConnectionError, HTTPError, Timeout, TooManyRedirects, SSLError
 import glob
 import os
-from user import User, user_objects
-from extractInstaProfileData import getting_scrape_data_insta_profile
-from formatHtml import formatHtml, printInstagramInfo
+from user import user, user_objects
+from extractInstaProfileData import getInstaFollowers
+from formatHtml import formatHtml
 from getCredentials import getProxyUsername, getProxyPassword
 
 def deleteHtmlFiles():
@@ -21,33 +21,34 @@ def deleteHtmlFiles():
     for file in html_files:
         os.remove(file)
 
-def printHtml(rawResponseText, filename, dirName):
+def printHtml(htmlText, filename, dirName):
     if not os.path.exists(dirName):
         os.makedirs(dirName)
 
     filename = os.path.join(dirName, filename)
 
     with open(filename, 'w', encoding='utf-8', errors="replace") as f:
-        formattedHtml = formatHtml(rawResponseText)
-        f.write(formattedHtml)
+        f.write(htmlText)
 
-def create_thread(payload, filename, proxyUsername, proxyPassword):
+def create_thread(userSocialMeida, payload, filename, proxyUsername, proxyPassword):
     thread = threading.Thread(target=make_request,
-				args=(payload, filename, proxyUsername, proxyPassword))
+				args=(userSocialMeida, payload, filename, proxyUsername, proxyPassword))
     return thread
 
-def make_request(payload, filename, proxyUsername, proxyPassWord, retry_attempts=3, retry_delay=5):
+def make_request(userSocialMeida, payload, filename, proxyUsername, proxyPassWord, retry_attempts=3, retry_delay=5):
 	for attempt in range(retry_attempts):   
 		try:
 			response = requests.request(
                 'POST',
                 'https://realtime.oxylabs.io/v1/queries',
-                # headers=headers,
                 auth=(proxyUsername, proxyPassWord),
                 json=payload,
             )
 			response.raise_for_status()
-			printHtml( response.text, filename, "htmlFiles")
+
+			userSocialMeida.formatHtmlResponse(response)
+			printHtml( userSocialMeida.html, filename, "htmlFiles")
+
 			break  # Successful request, exit the loop
 		except (ConnectionError, HTTPError, Timeout, TooManyRedirects, SSLError, RequestException) as e:
 			print(f"An error occurred: {e}")
@@ -71,7 +72,7 @@ def run_threads(thread_queue, num_threads_to_run):
     print("\033[92mstarting a new batch\033[0m")
     for thread in threads_to_run:
         thread.start()
-        time.sleep(1)
+        time.sleep(0.3)
     for thread in threads_to_run:
         thread.join()
     print("\033[92mlast batch finished\033[0m")
@@ -80,8 +81,8 @@ def run_threads(thread_queue, num_threads_to_run):
 
 deleteHtmlFiles()
 
-userLimit = 1 # (1 user has 6 requests or 6 threads)
-usersPerBatch = 25
+userLimit = 5 # (1 user has 6 requests or 6 threads)
+usersPerBatch = 50
 
 threads_per_batch = usersPerBatch * 6
 
@@ -93,7 +94,8 @@ proxyPassword = getProxyPassword()
 threads = []
 for user in user_objects[:userLimit]:
     instagramProfileThread = create_thread(
-        {"source": "universal", "url": user.insta.profileUrl, "render": "html"},
+         user.instaProfile,
+        {"source": "universal", "url": user.instaProfile.profileUrl, "render": "html"},
         'instagram_profile_{}.html'.format(user.fullName),
 		proxyUsername,
 		proxyPassword
@@ -101,7 +103,8 @@ for user in user_objects[:userLimit]:
     threads.append(instagramProfileThread)
 
     instagramPostThread = create_thread(
-        {"source": "universal", "url": user.insta.postUrl, "render": "html"},
+         user.instaPost,
+        {"source": "universal", "url": user.instaPost.postUrl, "render": "html"},
         'instagram_post_{}.html'.format(user.fullName),
 		proxyUsername,
 		proxyPassword
@@ -109,7 +112,8 @@ for user in user_objects[:userLimit]:
     threads.append(instagramPostThread)
 
     tiktokProfileThread = create_thread(
-        {"source": "universal", "url": user.tiktok.profileUrl, "render": "html"},
+         user.tiktokProfile,
+        {"source": "universal", "url": user.tiktokProfile.profileUrl, "render": "html"},
         'tiktok_profile_{}.html'.format(user.fullName),
 		proxyUsername,
 		proxyPassword
@@ -117,7 +121,8 @@ for user in user_objects[:userLimit]:
     threads.append(tiktokProfileThread)
 
     tiktokPostThread = create_thread(
-        {"source": "universal", "url": user.tiktok.postUrl, "render": "html"},
+         user.tiktokPost,
+        {"source": "universal", "url": user.tiktokPost.postUrl, "render": "html"},
         'tiktok_post_{}.html'.format(user.fullName),
 		proxyUsername,
 		proxyPassword
@@ -125,7 +130,8 @@ for user in user_objects[:userLimit]:
     threads.append(tiktokPostThread)
 
     twitterProfileThread = create_thread(
-        {"source": "universal", "url": user.twitter.profileUrl, "render": "html"},
+         user.twitterProfile,
+        {"source": "universal", "url": user.twitterProfile.profileUrl, "render": "html"},
         'twitter_profile_{}.html'.format(user.fullName),
 		proxyUsername,
 		proxyPassword
@@ -133,7 +139,8 @@ for user in user_objects[:userLimit]:
     threads.append(twitterProfileThread)
 
     twitterPostThread = create_thread(
-        {"source": "universal", "url": user.twitter.postUrl, "render": "html"},
+         user.tweet,
+        {"source": "universal", "url": user.tweet.postUrl, "render": "html"},
         'tweet_{}.html'.format(user.fullName),
 		proxyUsername,
 		proxyPassword
@@ -143,3 +150,7 @@ for user in user_objects[:userLimit]:
 
 while threads:
     run_threads(threads, threads_per_batch)
+
+
+# for user in user_objects[:userLimit]:
+	# user.instaProfile.followers = getInstaFollowers()
