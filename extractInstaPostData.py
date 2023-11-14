@@ -35,20 +35,6 @@ def extractInstagramLikeCount(input_string):
     else:
         return 0  # Return None if there is no match
 
-#The regular expression (.*?) will capture everything up
-# to the date pattern, and (\d{1,2}, \d{4}) will capture
-# the date "November 5, 2023". The colon : is also included.
-def formatInput(input_string):
-    match = re.search(r'(.+?(\d{1,2}, \d{4}):)', input_string)
-
-    if match:
-        # If a match is found, return the formatted input
-        formatted_input = match.group(1).strip()
-        return formatted_input
-    else:
-        # If no match is found, return the original input
-        return input_string.strip()
-
 def extractInstagramUsername(input_string):
     # Define a regular expression pattern to match the username
     pattern = re.compile(r'\s*-\s*([\w_]+)\s*on', re.IGNORECASE)
@@ -105,6 +91,20 @@ def extractInstagramContent(input_string):
 
     return None
 
+
+#The regular expression (.*?) will capture everything up
+# to the date pattern, and (\d{1,2}, \d{4}) will capture
+# the date "November 5, 2023". The colon : is also included.
+def formatInput(input_string):
+    match = re.search(r'(.+?(\d{1,2}, \d{4}):)', input_string)
+
+    if match:
+        # If a match is found, return the formatted input
+        formatted_input = match.group(1).strip()
+        return formatted_input
+    else:
+        # If no match is found, return the original input
+        return input_string.strip()
 
 # replace "type"  with "likesCount" for likes
 # or with "userName" for instagram username

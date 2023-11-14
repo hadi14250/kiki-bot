@@ -8,7 +8,7 @@ from utils import requestsFallback, reqUrl, restFetch
 import pandas as pd
 from openpyxl import load_workbook
 from user import User, user_objects
-from insta import getting_scrape_data
+from extractInstaProfileData import getting_scrape_data
 
 
 timeout = 10
@@ -48,7 +48,7 @@ for user in user_objects[:userNum]:
     if (user.insta.status == True):
         htmlText = reqUrl(user.UserNum, url, timeout, headers, "Instagram Profile")
         if (htmlText != None):
-            with open("instagramProfile.html", "w", encoding="utf-8") as file:
+            with open("instagramProfile.html", "w", encoding="utf-8", errors="replace") as file:
                 file.write(htmlText)
     # BeautifulSoup
         if __name__ == "__main__":
@@ -72,7 +72,7 @@ for user in user_objects[:userNum]:
     if (user.tiktok.status == True):
         htmlText = reqUrl(user.UserNum, url, timeout, headers, "Tiktok Profile")
         if (htmlText != None):
-            with open("tiktokProfile.html", "w", encoding="utf-8") as file:
+            with open("tiktokProfile.html", "w", encoding="utf-8", errors="replace") as file:
                     file.write(htmlText)
         time.sleep(shortRestTime)
     else:
@@ -83,7 +83,7 @@ for user in user_objects[:userNum]:
     if (user.insta.status == True):
         htmlText = reqUrl(user.UserNum, url, timeout, headers, "Instagram Post")
         if (htmlText != None):
-            with open("instagramPost.html", "w", encoding="utf-8") as file:
+            with open("instagramPost.html", "w", encoding="utf-8", errors="replace") as file:
                 file.write(htmlText)
         time.sleep(shortRestTime)
     else:
@@ -94,7 +94,7 @@ for user in user_objects[:userNum]:
     if (user.tiktok.status == True):
         htmlText = reqUrl(i, url, timeout, headers, "Tiktok Post")
         if (htmlText != None):
-            with open("tiktokPost.html", "w", encoding="utf-8") as file:
+            with open("tiktokPost.html", "w", encoding="utf-8", errors="replace") as file:
                     file.write(htmlText)
     else:
         print(f"Skipping tiktok post for {user.fullName} as no profile url specified")

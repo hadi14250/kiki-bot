@@ -5,8 +5,9 @@ from requests.exceptions import RequestException, ConnectionError, HTTPError, Ti
 import glob
 import os
 from user import User, user_objects
-from insta import getting_scrape_data_insta_post
+from extractInstaProfileData import getting_scrape_data_insta_profile
 from formatHtml import formatHtml, printInstagramInfo
+from getCredentials import getProxyUsername, getProxyPassword
 
 def deleteHtmlFiles():
     curentDir = os.getcwd()
@@ -26,26 +27,23 @@ def printHtml(rawResponseText, filename, dirName):
 
     filename = os.path.join(dirName, filename)
 
-    with open(filename, 'w', encoding='utf-8') as f:
+    with open(filename, 'w', encoding='utf-8', errors="replace") as f:
         formattedHtml = formatHtml(rawResponseText)
         f.write(formattedHtml)
 
-def create_thread(payload, filename):
-    thread = threading.Thread(target=make_request, args=(payload, filename))
+def create_thread(payload, filename, proxyUsername, proxyPassword):
+    thread = threading.Thread(target=make_request,
+				args=(payload, filename, proxyUsername, proxyPassword))
     return thread
 
-def make_request(payload, filename, retry_attempts=3, retry_delay=5):
-	# headers = {
-	# 	"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36",
-	# 	# Add other headers if needed
-	# }
+def make_request(payload, filename, proxyUsername, proxyPassWord, retry_attempts=3, retry_delay=5):
 	for attempt in range(retry_attempts):   
 		try:
 			response = requests.request(
                 'POST',
                 'https://realtime.oxylabs.io/v1/queries',
                 # headers=headers,
-                auth=('hadi14250', '!SrJY8SUHSYp8nB'),
+                auth=(proxyUsername, proxyPassWord),
                 json=payload,
             )
 			response.raise_for_status()
@@ -82,47 +80,63 @@ def run_threads(thread_queue, num_threads_to_run):
 
 deleteHtmlFiles()
 
-userLimit = 10 # (1 user has 6 requests or 6 threads)
+userLimit = 1 # (1 user has 6 requests or 6 threads)
 usersPerBatch = 25
 
 threads_per_batch = usersPerBatch * 6
 
 
+# Credentials
+proxyUsername = getProxyUsername()
+proxyPassword = getProxyPassword()
+
 threads = []
 for user in user_objects[:userLimit]:
     instagramProfileThread = create_thread(
         {"source": "universal", "url": user.insta.profileUrl, "render": "html"},
-        'instagram_profile_{}.html'.format(user.fullName)
+        'instagram_profile_{}.html'.format(user.fullName),
+		proxyUsername,
+		proxyPassword
     )
     threads.append(instagramProfileThread)
 
     instagramPostThread = create_thread(
         {"source": "universal", "url": user.insta.postUrl, "render": "html"},
-        'instagram_post_{}.html'.format(user.fullName)
+        'instagram_post_{}.html'.format(user.fullName),
+		proxyUsername,
+		proxyPassword
     )
     threads.append(instagramPostThread)
 
     tiktokProfileThread = create_thread(
         {"source": "universal", "url": user.tiktok.profileUrl, "render": "html"},
-        'tiktok_profile_{}.html'.format(user.fullName)
+        'tiktok_profile_{}.html'.format(user.fullName),
+		proxyUsername,
+		proxyPassword
     )
     threads.append(tiktokProfileThread)
 
     tiktokPostThread = create_thread(
         {"source": "universal", "url": user.tiktok.postUrl, "render": "html"},
-        'tiktok_post_{}.html'.format(user.fullName)
+        'tiktok_post_{}.html'.format(user.fullName),
+		proxyUsername,
+		proxyPassword
     )
     threads.append(tiktokPostThread)
 
     twitterProfileThread = create_thread(
         {"source": "universal", "url": user.twitter.profileUrl, "render": "html"},
-        'twitter_profile_{}.html'.format(user.fullName)
+        'twitter_profile_{}.html'.format(user.fullName),
+		proxyUsername,
+		proxyPassword
     )
     threads.append(twitterProfileThread)
 
     twitterPostThread = create_thread(
         {"source": "universal", "url": user.twitter.postUrl, "render": "html"},
-        'tweet_{}.html'.format(user.fullName)
+        'tweet_{}.html'.format(user.fullName),
+		proxyUsername,
+		proxyPassword
     )
     threads.append(twitterPostThread)
 

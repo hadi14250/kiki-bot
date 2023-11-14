@@ -13,7 +13,7 @@ def requestsFallback(i, url, timeout, headers):
         r = requests.get(url, headers=headers, timeout=timeout)
         r.raise_for_status()
         print(f"\033[35mSuccess for User {i} using requests.get() method! ✅ \033[0m")
-        with open("backUp.html", "w") as file:
+        with open("backUp.html", "w", encoding='utf-8', errors="replace") as file:
             file.write(r.text)
         return r.text
     except requests.ConnectionError as e:

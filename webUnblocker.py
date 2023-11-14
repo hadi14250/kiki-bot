@@ -19,5 +19,5 @@ response = requests.request(
 )
 
 # Save returned HTML to result.html file
-with open('webUnblocker.html', 'w') as f:
+with open('webUnblocker.html', 'w', encoding='utf-8', errors="replace") as f:
     f.write(response.text)
