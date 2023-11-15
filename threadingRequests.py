@@ -5,11 +5,13 @@ from requests.exceptions import RequestException, ConnectionError, HTTPError, Ti
 import glob
 import os
 from user import user, user_objects
-from extractInstaProfileData import getInstaFollowers
 from formatHtml import formatHtml
 from getCredentials import getProxyUsername, getProxyPassword
 from extractInstaPostData import extractInstaPostData
 from testFunctions import printUserInfo, printHtml
+from extractInstaProfileData import getInstaFollowers
+from extractTiktokProfileData import getTiktokFollowers
+from extractTiktokPostData import extractTiktokPostData
 
 def deleteHtmlFiles():
     curentDir = os.getcwd()
@@ -74,7 +76,7 @@ def run_threads(thread_queue, num_threads_to_run):
 
 deleteHtmlFiles()
 
-userLimit = 1 # (1 user has 6 requests or 6 threads)
+userLimit = 10 # (1 user has 6 requests or 6 threads)
 usersPerBatch = 50
 
 threads_per_batch = usersPerBatch * 6
@@ -151,4 +153,6 @@ for user in user_objects[:userLimit]:
 	user.instaPost.postLike = extractInstaPostData(user.instaPost.soupHtml, "likeCount")
 	user.instaPost.postText = extractInstaPostData(user.instaPost.soupHtml, "content")
 	user.instaPost.postDate = extractInstaPostData(user.instaPost.soupHtml, "postDate")
-	printUserInfo(user, "testing.txt", "testingLogs")
+	user.tiktokProfile.followers = getTiktokFollowers(user.tiktokProfile.soupHtml)
+	user.tiktokPost.postLike = extractTiktokPostData(user.tiktokPost.soupHtml, "likeCount")
+	printUserInfo(user, "testing.log", "testingLogs")

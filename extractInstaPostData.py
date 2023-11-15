@@ -108,23 +108,26 @@ def formatInput(input_string):
 # or with "userName" for instagram username
 # or with "postDate" for date of the post
 def	extractInstaPostData(soupHtml, type):
-	# extracting meta html tag with the "og:description" property
-	metaDesc = soupHtml.find("meta", property="og:description")
-	metaDescContent = metaDesc.get("content") if metaDesc else ""
-	formattedMetaDescContent = formatInput(metaDescContent)
+	try:
+		# extracting meta html tag with the "og:description" property
+		metaDesc = soupHtml.find("meta", property="og:description")
+		metaDescContent = metaDesc.get("content") if metaDesc else ""
+		formattedMetaDescContent = formatInput(metaDescContent)
 
-	# extracting meta html tag with the "og:title" property
-	metaTitle = soupHtml.find("meta", property="og:title")
-	metaTitleContent = metaTitle.get("content") if metaTitle else ""
+		# extracting meta html tag with the "og:title" property
+		metaTitle = soupHtml.find("meta", property="og:title")
+		metaTitleContent = metaTitle.get("content") if metaTitle else ""
 
-	if (type == "userName"):
-		return (extractInstagramUsername(formattedMetaDescContent))
-	elif (type == "likeCount"):
-		return (extractInstagramLikeCount(formattedMetaDescContent))
-	elif (type == "content"):
-		return (extractInstagramContent(metaTitleContent))
-	elif (type == "postDate"):
-		return (extractInstagramDate(formattedMetaDescContent))
+		if (type == "userName"):
+			return (extractInstagramUsername(formattedMetaDescContent))
+		elif (type == "likeCount"):
+			return (extractInstagramLikeCount(formattedMetaDescContent))
+		elif (type == "content"):
+			return (extractInstagramContent(metaTitleContent))
+		elif (type == "postDate"):
+			return (extractInstagramDate(formattedMetaDescContent))
+	except:
+		return (None)
 
 
 

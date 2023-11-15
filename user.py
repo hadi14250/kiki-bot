@@ -152,7 +152,7 @@ for user in user_objects:
 	user.instaProfile.profileUrl = constructInstagramUrl(user.instaProfile.csvUserName)
 	user.tiktokProfile.profileUrl = constructTiktokUrl(user.tiktokProfile.csvUserName)
 	user.twitterProfile.profileUrl = constructTwitterUrl(user.twitterProfile.csvUserName)
-
+	
 # printUserInfo()
 
 print("\033[92mData from excel Sheet reading done\033[0m")

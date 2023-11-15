@@ -169,4 +169,7 @@ cython_debug/
 *.env
 
 *.xlsx
+
 *.txt
+
+*.log
