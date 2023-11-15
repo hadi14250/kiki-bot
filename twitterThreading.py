@@ -9,6 +9,7 @@ from extractInstaProfileData import getInstaFollowers
 from formatHtml import formatHtml
 from getCredentials import getProxyUsername, getProxyPassword
 from extractInstaPostData import extractInstaPostData
+from testFunctions import printUserInfo, printHtml
 
 def deleteHtmlFiles():
     curentDir = os.getcwd()
@@ -21,15 +22,6 @@ def deleteHtmlFiles():
     # Remove each file
     for file in html_files:
         os.remove(file)
-
-def printHtml(htmlText, filename, dirName):
-    if not os.path.exists(dirName):
-        os.makedirs(dirName)
-
-    filename = os.path.join(dirName, filename)
-
-    with open(filename, 'w', encoding='utf-8', errors="replace") as f:
-        f.write(htmlText)
 
 def create_thread(userSocialMeida, payload, filename, proxyUsername, proxyPassword):
     thread = threading.Thread(target=make_request,
@@ -155,10 +147,8 @@ while threads:
 
 for user in user_objects[:userLimit]:
 	user.instaProfile.followers = getInstaFollowers(user.instaProfile.soupHtml)
-	user.instaPost.excractedUserName = extractInstaPostData(user.instaPost.html, "userName")
-	user.instaPost.postLike = extractInstaPostData(user.instaPost.html, "likeCount")
-	user.instaPost.postText = extractInstaPostData(user.instaPost.html, "content")
-	user.instaPost.postDate = extractInstaPostData(user.instaPost.html, "postDate")
-	print("Username: {} has {} followers, on his {} post he has {} likes. content is \n----------->\n{}\n<-----------\n\n\n".format(
-          user.instaProfile.csvUserName, user.instaProfile.followers,
-        	user.instaPost.postDate, user.instaPost.postLike, user.instaPost.postText))
+	user.instaPost.excractedUserName = extractInstaPostData(user.instaPost.soupHtml, "userName")
+	user.instaPost.postLike = extractInstaPostData(user.instaPost.soupHtml, "likeCount")
+	user.instaPost.postText = extractInstaPostData(user.instaPost.soupHtml, "content")
+	user.instaPost.postDate = extractInstaPostData(user.instaPost.soupHtml, "postDate")
+	printUserInfo(user, "testing.txt", "testingLogs")

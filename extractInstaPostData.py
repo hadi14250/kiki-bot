@@ -107,17 +107,14 @@ def formatInput(input_string):
 # replace "type"  with "likesCount" for likes
 # or with "userName" for instagram username
 # or with "postDate" for date of the post
-def	extractInstaPostData(htmlResponse, type):
-
-	soup = BeautifulSoup(htmlResponse, "html.parser")
-
+def	extractInstaPostData(soupHtml, type):
 	# extracting meta html tag with the "og:description" property
-	metaDesc = soup.find("meta", property="og:description")
+	metaDesc = soupHtml.find("meta", property="og:description")
 	metaDescContent = metaDesc.get("content") if metaDesc else ""
 	formattedMetaDescContent = formatInput(metaDescContent)
 
 	# extracting meta html tag with the "og:title" property
-	metaTitle = soup.find("meta", property="og:title")
+	metaTitle = soupHtml.find("meta", property="og:title")
 	metaTitleContent = metaTitle.get("content") if metaTitle else ""
 
 	if (type == "userName"):
