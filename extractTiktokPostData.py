@@ -52,7 +52,7 @@ def	extractTiktokPostData(soupHtml, type):
     # Find the script tag by id
 	try:
 		scriptTag = soupHtml.find("script", id="__UNIVERSAL_DATA_FOR_REHYDRATION__")
-		print("Original\n--->{}\n\n".format(scriptTag.contents[0][:18000]))
+		# print("Original\n--->{}\n\n".format(scriptTag.contents[0][:18000]))
 		if (type == "likeCount"):
 			return (extractTiktokLikes(scriptTag))
 	except:

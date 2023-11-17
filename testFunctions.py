@@ -21,7 +21,7 @@ def printContentToFile(content, filename, dirName):
 
 def	printUserInfo(user, fileName, dirName):
 	stringToPrint = "Insta Username: {} has {} followers, on their {} post he has {} likes. content is \n----------->\n{}\n<-----------\n\n\n".format(
-          user.instaProfile.csvUserName, user.instaProfile.followers,
+          user.instaPost.excractedUserName, user.instaProfile.followers,
         	user.instaPost.postDate, user.instaPost.postLike, user.instaPost.postText)
 
 	printContentToFile(stringToPrint, fileName, dirName)

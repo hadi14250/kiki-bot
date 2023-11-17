@@ -1,9 +1,9 @@
-import os
+from extractTiktokProfileData import strCountToInt
 
 def getting_parse_data(i):
 	i = i.split("_")[0]
 	i = i.split(" ")
-	return (i[0])
+	return (strCountToInt(i[0]))
 
 def getInstaFollowers(soupHtml):
 	if not (soupHtml):

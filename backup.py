@@ -6,33 +6,33 @@ from datetime import datetime
 
 def extractInstagramLikeCount(input_string):
     # Check for the presence of "likes" in the input string
-    if "likes" not in input_string.lower():
-        return 0
+	if "likes" not in input_string.lower():
+		return 0
 
-    # Define a regular expression pattern to match different formats of like counts
-    pattern = re.compile(r'(\d{1,3}(?:,\d{3})*(?:\.\d+)?)\s*(K|k|M|m)?', re.IGNORECASE)
+	# Define a regular expression pattern to match different formats of like counts
+	pattern = re.compile(r'(\d{1,3}(?:,\d{3})*(?:\.\d+)?)\s*(K|k|M|m)?', re.IGNORECASE)
 
-    # Search for the pattern in the input string
-    match = pattern.search(input_string)
+	# Search for the pattern in the input string
+	match = pattern.search(input_string)
 
-    if match:
-        # Extract and normalize the like count
-        like_count = match.group(1).replace(',', '')
-        unit = match.group(2)
+	if match:
+		# Extract and normalize the like count
+		like_count = match.group(1).replace(',', '')
+		unit = match.group(2)
 
-        if '.' in like_count:
-            # If decimal part is present, convert to integer after multiplying with the appropriate factor
-            like_count = str(int(float(like_count) * (1000 if unit.lower() == 'k' else 1000000)))
-        else:
-            # If no decimal part, multiply with 'K' or 'M' accordingly
-            if unit and unit.lower() == 'k':
-                like_count = str(int(like_count) * 1000)
-            elif unit and unit.lower() == 'm':
-                like_count = str(int(like_count) * 1000000)
+		if '.' in like_count:
+			# If decimal part is present, convert to integer after multiplying with the appropriate factor
+			like_count = str(int(float(like_count) * (1000 if unit.lower() == 'k' else 1000000)))
+		else:
+			# If no decimal part, multiply with 'K' or 'M' accordingly
+			if unit and unit.lower() == 'k':
+				like_count = str(int(like_count) * 1000)
+			elif unit and unit.lower() == 'm':
+				like_count = str(int(like_count) * 1000000)
 
-        return int(like_count)
-    else:
-        return 0  # Return None if there is no match
+		return int(like_count)
+	else:
+		return 0  # Return None if there is no match
 
 def extractInstagramUsername(input_string):
 	# Define a regular expression pattern to match the username
@@ -110,22 +110,23 @@ def formatInput(input_string):
 def	extractInstaPostData(soupHtml, type):
 	try:
 		# extracting meta html tag with the "og:description" property
-		metaDesc = soupHtml.find("meta", property="og:description")
-		metaDescContent = metaDesc.get("content") if metaDesc else ""
-		formattedMetaDescContent = formatInput(metaDescContent)
+		# metaDesc = soupHtml.find("meta", property="description")
 
-		# extracting meta html tag with the "og:title" property
-		metaTitle = soupHtml.find("meta", property="og:title")
-		metaTitleContent = metaTitle.get("content") if metaTitle else ""
+		metaDesc = soupHtml.find('meta', attrs={'name': 'description'})
+
+		metaDescContent = metaDesc.get("content") if metaDesc else ""
+		# formattedMetaDescContent = formatInput(metaDescContent)
 
 		if (type == "userName"):
-			return (extractInstagramUsername(formattedMetaDescContent))
+			return (extractInstagramUsername(metaDescContent))
 		elif (type == "likeCount"):
-			return (extractInstagramLikeCount(formattedMetaDescContent))
+			print("\n--->\nin likes:\n{}\n<---\n".format(metaDescContent))
+			return (extractInstagramLikeCount(metaDescContent))
 		elif (type == "content"):
-			return (extractInstagramContent(metaTitleContent))
+			print("\n--->\nin content\n{}\n<---\n".format(metaDescContent))
+			return (extractInstagramContent(metaDescContent))
 		elif (type == "postDate"):
-			return (extractInstagramDate(formattedMetaDescContent))
+			return (extractInstagramDate(metaDescContent))
 	except:
 		return (None)
 
@@ -159,3 +160,4 @@ def	extractInstaPostData(soupHtml, type):
 #                 "\n<----------")
 # 	counter += 1
             
+
