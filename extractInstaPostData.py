@@ -104,6 +104,15 @@ def formatInput(input_string):
         # If no match is found, return the original input
         return input_string.strip()
 
+# def	fallBackInstaPost(soupHtml):
+
+# check for the presence of the username from the excel sheet in the post html template
+def checkUserNamePresence(csvUsername, htmlText):
+	if csvUsername in htmlText:
+		return (csvUsername)
+	else:
+		return ("NOT_A_MATCH")
+
 # replace "type"  with "likesCount" for likes
 # or with "userName" for instagram username
 # or with "postDate" for date of the post
@@ -118,14 +127,24 @@ def	extractInstaPostData(soupHtml, type):
 		metaTitle = soupHtml.find("meta", property="og:title")
 		metaTitleContent = metaTitle.get("content") if metaTitle else ""
 
-		if (type == "userName"):
-			return (extractInstagramUsername(formattedMetaDescContent))
-		elif (type == "likeCount"):
-			return (extractInstagramLikeCount(formattedMetaDescContent))
+		if (type == "likeCount"):
+			likeCount = extractInstagramLikeCount(formattedMetaDescContent)
+			if not (likeCount):
+				metaDesc = soupHtml.find('meta', attrs={'name': 'description'})
+				metaDescContent = metaDesc.get("content") if metaDesc else ""
+				formattedMetaDescContent = formatInput(metaDescContent)
+				likeCount = extractInstagramLikeCount(formattedMetaDescContent)
+			return (likeCount)
 		elif (type == "content"):
 			return (extractInstagramContent(metaTitleContent))
 		elif (type == "postDate"):
-			return (extractInstagramDate(formattedMetaDescContent))
+			postDate = extractInstagramDate(formattedMetaDescContent)
+			if not (postDate):
+				metaDesc = soupHtml.find('meta', attrs={'name': 'description'})
+				metaDescContent = metaDesc.get("content") if metaDesc else ""
+				formattedMetaDescContent = formatInput(metaDescContent)
+				postDate = extractInstagramDate(formattedMetaDescContent)
+			return (postDate)
 	except:
 		return (None)
 

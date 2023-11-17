@@ -20,7 +20,8 @@ def printContentToFile(content, filename, dirName):
         f.write(content)
 
 def	printUserInfo(user, fileName, dirName):
-	stringToPrint = "Insta Username: {} has {} followers, on their {} post he has {} likes. content is \n----------->\n{}\n<-----------\n\n\n".format(
+	stringToPrint = "File Name: {}\nInsta Username: {} has {} followers, on their {} post he has {} likes. content is \n----------->\n{}\n<-----------\n\n\n".format(
+          fileName,
           user.instaPost.excractedUserName, user.instaProfile.followers,
         	user.instaPost.postDate, user.instaPost.postLike, user.instaPost.postText)
 

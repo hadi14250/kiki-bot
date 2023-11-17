@@ -8,6 +8,7 @@ from user import user, user_objects
 from formatHtml import formatHtml
 from getCredentials import getProxyUsername, getProxyPassword
 from extractInstaPostData import extractInstaPostData
+from extractInstaPostData import checkUserNamePresence
 from testFunctions import printUserInfo, printHtml
 from extractInstaProfileData import getInstaFollowers
 from extractTiktokProfileData import getTiktokFollowers
@@ -149,7 +150,7 @@ while threads:
 
 for user in user_objects[:userLimit]:
 	user.instaProfile.followers = getInstaFollowers(user.instaProfile.soupHtml)
-	user.instaPost.excractedUserName = extractInstaPostData(user.instaPost.soupHtml, "userName")
+	user.instaPost.excractedUserName = checkUserNamePresence(user.instaProfile.csvUserName, user.instaPost.html)
 	user.instaPost.postLike = extractInstaPostData(user.instaPost.soupHtml, "likeCount")
 	user.instaPost.postText = extractInstaPostData(user.instaPost.soupHtml, "content")
 	user.instaPost.postDate = extractInstaPostData(user.instaPost.soupHtml, "postDate")
