@@ -3,6 +3,7 @@ import os
 import time
 import re
 from datetime import datetime
+from emojieDictionary import replaceEmojis
 
 def extractInstagramLikeCount(input_string):
     # Check for the presence of "likes" in the input string
@@ -107,16 +108,50 @@ def formatInput(input_string):
 # def	fallBackInstaPost(soupHtml):
 
 # check for the presence of the username from the excel sheet in the post html template
-def checkUserNamePresence(csvUsername, htmlText):
-	if csvUsername in htmlText:
+def checkUserNamePresence(csvUsername, postHtmlText):
+	if csvUsername in postHtmlText:
 		return (csvUsername)
 	else:
 		return ("NOT_A_MATCH")
 
+#returns the first occurance of a string
+def find_first_occurrence(main_string, sub_string):
+    index = main_string.find(sub_string)
+    if index != -1:
+        return main_string[index + len(sub_string):]
+    else:
+        return None
+
+def replace_string(main_string, string_to_look_for, string_to_replace):
+    """
+    Replaces occurrences of string_to_look_for with string_to_replace in the main_string.
+    """
+    result_string = main_string.replace(string_to_look_for, string_to_replace)
+    return result_string
+
+def	extract_text_between_quotes(input_string):
+	first_quote_index = input_string.find('"')
+    
+	if first_quote_index == -1:
+		return None
+
+	second_quote_index = input_string.find('"', first_quote_index + 1)
+    
+	if second_quote_index == -1:
+		return None
+
+	third_quote_index = input_string.find('"', second_quote_index + 1)
+
+	if third_quote_index == -1:
+		return None
+
+	contentString = input_string[second_quote_index + 1 : third_quote_index]
+	return (replace_string(contentString, "u0040", "@"))
+
 # replace "type"  with "likesCount" for likes
 # or with "userName" for instagram username
 # or with "postDate" for date of the post
-def	extractInstaPostData(soupHtml, type):
+def	extractInstaPostData(postHtml, soupHtml, type):
 	try:
 		# extracting meta html tag with the "og:description" property
 		metaDesc = soupHtml.find("meta", property="og:description")
@@ -136,7 +171,13 @@ def	extractInstaPostData(soupHtml, type):
 				likeCount = extractInstagramLikeCount(formattedMetaDescContent)
 			return (likeCount)
 		elif (type == "content"):
-			return (extractInstagramContent(metaTitleContent))
+			postContent = extractInstagramContent(metaTitleContent)
+			if not (postContent):
+				testPostContent = find_first_occurrence(postHtml, '{"title":')
+				testPostContent = extract_text_between_quotes (testPostContent)
+				testPostContent = replaceEmojis(testPostContent)
+				return (testPostContent)
+			return (replaceEmojis(postContent))
 		elif (type == "postDate"):
 			postDate = extractInstagramDate(formattedMetaDescContent)
 			if not (postDate):

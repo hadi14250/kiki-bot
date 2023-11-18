@@ -84,8 +84,8 @@ threads_per_batch = usersPerBatch * 6
 
 
 # Credentials
-proxyUsername = getProxyUsername()
-proxyPassword = getProxyPassword()
+proxyUsername = "hadi1425000" #getProxyUsername()
+proxyPassword = "!zwTTdq86wLj6FM" #getProxyPassword()
 
 threads = []
 for user in user_objects[:userLimit]:
@@ -151,9 +151,9 @@ while threads:
 for user in user_objects[:userLimit]:
 	user.instaProfile.followers = getInstaFollowers(user.instaProfile.soupHtml)
 	user.instaPost.excractedUserName = checkUserNamePresence(user.instaProfile.csvUserName, user.instaPost.html)
-	user.instaPost.postLike = extractInstaPostData(user.instaPost.soupHtml, "likeCount")
-	user.instaPost.postText = extractInstaPostData(user.instaPost.soupHtml, "content")
-	user.instaPost.postDate = extractInstaPostData(user.instaPost.soupHtml, "postDate")
+	user.instaPost.postLike = extractInstaPostData(user.instaPost.html, user.instaPost.soupHtml, "likeCount")
+	user.instaPost.postText = extractInstaPostData(user.instaPost.html, user.instaPost.soupHtml, "content")
+	user.instaPost.postDate = extractInstaPostData(user.instaPost.html, user.instaPost.soupHtml, "postDate")
 	user.tiktokProfile.followers = getTiktokFollowers(user.tiktokProfile.soupHtml)
 	user.tiktokPost.postLike = extractTiktokPostData(user.tiktokPost.soupHtml, "likeCount")
 	printUserInfo(user, "testing.log", "testingLogs")
