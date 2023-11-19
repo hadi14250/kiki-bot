@@ -6,11 +6,15 @@ def getting_parse_data(i):
 	return (strCountToInt(i[0]))
 
 def getInstaFollowers(soupHtml):
-	if not (soupHtml):
-		return (None)
-	meta = soupHtml.find("meta", property="og:description")
-	return getting_parse_data(meta.attrs['content'])
-
+    if not soupHtml:
+        return None
+    
+    meta = soupHtml.find("meta", property="og:description")
+    
+    if meta and 'content' in meta.attrs:
+        return getting_parse_data(meta.attrs['content'])
+    else:
+        return None
 
 # ----------->	below code os for testing purposes	<------------
 

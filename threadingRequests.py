@@ -32,27 +32,26 @@ def create_thread(userSocialMeida, payload, filename, proxyUsername, proxyPasswo
     return thread
 
 def make_request(userSocialMeida, payload, filename, proxyUsername, proxyPassWord, retry_attempts=3, retry_delay=5):
-	for attempt in range(retry_attempts):   
-		try:
-			response = requests.request(
+    for attempt in range(retry_attempts):   
+        try:
+            response = requests.request(
                 'POST',
                 'https://realtime.oxylabs.io/v1/queries',
                 auth=(proxyUsername, proxyPassWord),
                 json=payload,
             )
-			response.raise_for_status()
+            response.raise_for_status()
+            userSocialMeida.formatHtmlResponse(response)
+            printHtml( userSocialMeida.html, filename, "htmlFiles")
 
-			userSocialMeida.formatHtmlResponse(response)
-			printHtml( userSocialMeida.html, filename, "htmlFiles")
-
-			break  # Successful request, exit the loop
-		except (ConnectionError, HTTPError, Timeout, TooManyRedirects, SSLError, RequestException) as e:
-			print(f"An error occurred: {e}")
-			if attempt < retry_attempts - 1:
-				print(f"Retry Number {attempt + 1} for {filename} in {retry_delay} seconds...")
-				time.sleep(retry_delay)
-			else:
-				print(f"\033[91mMax retries reached. Request failed for {filename}\033[0m")
+            break  # Successful request, exit the loop
+        except (ConnectionError, HTTPError, Timeout, TooManyRedirects, SSLError, RequestException) as e:
+            print(f"An error occurred: {e}")
+            if attempt < retry_attempts - 1:
+                print(f"Retry Number {attempt + 1} for {filename} in {retry_delay} seconds...")
+                time.sleep(retry_delay)
+            else:
+                print(f"\033[91mMax retries reached. Request failed for {filename}\033[0m")
 
 
 def run_threads(thread_queue, num_threads_to_run):
@@ -77,7 +76,7 @@ def run_threads(thread_queue, num_threads_to_run):
 
 deleteHtmlFiles()
 
-userLimit = 10 # (1 user has 6 requests or 6 threads)
+userLimit = 12 # (1 user has 6 requests or 6 threads)
 usersPerBatch = 50
 
 threads_per_batch = usersPerBatch * 6

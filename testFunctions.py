@@ -20,12 +20,15 @@ def printContentToFile(content, filename, dirName):
         f.write(content)
 
 def	printUserInfo(user, fileName, dirName):
-	stringToPrint = "File Name: {}\nInsta Username: {} has {} followers, on their {} post he has {} likes. content is \n----------->\n{}\n<-----------\n\n\n".format(
-          fileName,
+    stringToPrint = "\n\nInsta Username: {} has {} followers, on their {} post he has {} likes. Profile job_id is: {}, Post job_id is: {}  content is \n----------->\n{}\n<-----------\n\n\n".format(
           user.instaPost.excractedUserName, user.instaProfile.followers,
-        	user.instaPost.postDate, user.instaPost.postLike, user.instaPost.postText)
+        	user.instaPost.postDate, user.instaPost.postLike,
+            user.instaProfile.proxyJobID, user.instaPost.proxyJobID, user.instaPost.postText)
 
-	printContentToFile(stringToPrint, fileName, dirName)
-	stringToPrint = "Tiktok Username: {} has {} followers and thier post has: {} likes\n\n\n".format(
-          user.tiktokProfile.csvUserName, user.tiktokProfile.followers, user.tiktokPost.postLike)
-	printContentToFile(stringToPrint, fileName, dirName)
+    printContentToFile(stringToPrint, fileName, dirName)
+    stringToPrint = "Tiktok Username: {} has {} followers and thier post has: {} likes\n\n\n".format(
+        user.tiktokProfile.csvUserName, user.tiktokProfile.followers, user.tiktokPost.postLike)
+    printContentToFile(stringToPrint, fileName, dirName)
+
+    stringToPrint = "Twitter Profile Job_id: {}\n\n******************\n\n".format(user.twitterProfile.proxyJobID)
+    printContentToFile(stringToPrint, fileName, dirName)

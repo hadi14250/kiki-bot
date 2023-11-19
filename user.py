@@ -7,6 +7,7 @@ from extractInstaProfileData import getInstaFollowers
 from extractInstaPostData import extractInstaPostData
 from formatHtml import formatHtml
 from bs4 import BeautifulSoup
+from findProxyJobID import findProxyJobID
 
 def get_program_path():
     # Get the path to the currently running Python script
@@ -30,11 +31,13 @@ class SocialMediaProfile:
 		self.soupHtml			= None
 		self.followers 			= 0
 		self.registerDate		= None
+		self.proxyJobID		= None
 
 	def setScrapedData(self, type):
 		if (type == "instagram"):
 			self.followers = getInstaFollowers(self.html)
 	def	formatHtmlResponse(self, response):
+		self.proxyJobID = findProxyJobID(response.text, "job_id")
 		self.response = response
 		self.html = formatHtml(response.text)
 		if (self.html):
@@ -53,6 +56,7 @@ class SocialMediaPost:
 		self.postTags			= None
 		self.postDate			= None
 		self.payment			= 0
+		self.proxyJobID		= None
 
 	def setScrapedData(self, type):
 		if (type == "instagram"):
@@ -62,6 +66,7 @@ class SocialMediaPost:
 			self.postDate			= extractInstaPostData(self.html, "postDate")
 			# self.postTags			= not yet done
 	def	formatHtmlResponse(self, response):
+		self.proxyJobID = findProxyJobID(response.text, "job_id")
 		self.response = response
 		self.html = formatHtml(response.text)
 		if (self.html):
@@ -81,7 +86,6 @@ class User:
 		self.twitterProfile	= twitterProfile
 		self.tweet			= tweet
 		self.walletAdd		= walletAdd
-		self.proxyJobID		= None
 
 # Load the Excel file
 file_name = "user_data.xlsx"

@@ -314,6 +314,102 @@ def replaceEmojis(input_string):
         'u00a9': '©',  # Copyright Sign
         'u274c': '❌',  # Cross Mark
         'u27a1ufe0f': '➡️',  # Right Arrow
+
+        'ud83dude00': '😀',  # Grinning Face
+        'ud83dude04': '😄',  # Smiling Face with Open Mouth and Smiling Eyes
+        'ud83dude42': '😂',  # Face with Tears of Joy
+        'ud83dude43': '😃',  # Smiling Face with Open Mouth
+        'ud83eudee0': '📰',  # Rolled-Up Newspaper
+        'ud83eudee3': '📣',  # Megaphone
+        'ud83eudee2': '📢',  # Loudspeaker
+        'ud83eudee1': '📡',  # Satellite Antenna
+        'ud83eude00': '📀',  # DVD
+        'ud83dude2a': '🌀',  # Cyclone
+        'u263aufe0f': '⚓',  # Anchor
+        'ud83dude11': '😔',  # Pensive Face
+        'ud83dude17': '😗',  # Kissing Face
+        'ud83eudee2': '📢',  # Loudspeaker
+        'ud83eudee3': '📣',  # Megaphone
+        'ud83eudee1': '📡',  # Satellite Antenna
+        'ud83eude10': '📐',  # Triangular Ruler
+        'ud83eudd28': '😨',  # Fearful Face
+        'ud83eudee8': '📨',  # Incoming Envelope
+        'ud83eudee5': '📥',  # Inbox Tray
+        'ud83eudee6': '📦',  # Package
+        'ud83dude36': '😶',  # Face Without Mouth
+        'ud83dude37': '😷',  # Face with Medical Mask
+        'ud83dude38': '😸',  # Grinning Cat with Smiling Eyes
+        'ud83dude39': '😹',  # Cat with Tears of Joy
+        'ud83dude3a': '😺',  # Smiling Cat with Heart-Eyes
+        'ud83dude3b': '😻',  # Cat with Wry Smile
+        'ud83dude3c': '😼',  # Kissing Cat
+        'ud83dude3d': '😽',  # Pouting Cat
+        'ud83dude3e': '😾',  # Crying Cat
+        'ud83dude3f': '😿',  # Weary Cat
+        'ud83dude40': '🙀',  # Cat with Open Mouth
+        'ud83eude8': '📨',  # Incoming Envelope
+        'ud83eudee8': '📨',  # Incoming Envelope (duplicate entry)
+        'ud83eudd23': '📣',  # Megaphone
+        'ud83eudee8': '📨',  # Incoming Envelope (duplicate entry)
+        'ud83eudee5': '📥',  # Inbox Tray
+        'ud83eudee6': '📦',  # Package
+        'ud83eudee2': '📢',  # Loudspeaker
+        'ud83eudee3': '📣',  # Megaphone
+        'ud83eudee1': '📡',  # Satellite Antenna
+        'ud83eudd22': '📢',  # Loudspeaker (duplicate entry)
+        'ud83eudd2e': '📦',  # Package (duplicate entry)
+        'ud83eudd27': '📨',  # Incoming Envelope (duplicate entry)
+        'ud83eudd75': '📣',  # Megaphone (duplicate entry)
+        'ud83eudd76': '📦',  # Package (duplicate entry)
+        'ud83eudd74': '📨',  # Incoming Envelope (duplicate entry)
+        'ud83eudd2f': '🚯',  # No Littering Symbol
+        'ud83eudd20': '🚠',  # Mountain Cableway
+        'ud83eudd73': '🛳️',  # Passenger Ship
+        'ud83eudd78': '🛸',  # Flying Saucer
+        'ud83dude80': '💀',  # Skull
+        'ud83eudee4': '📤',  # Outbox Tray
+        'ud83dude1f': '📟',  # Pager
+        'ud83dude41': '🕁',  # Empty Document
+        'u2639ufe0f': '☹️',  # White Frowning Face
+        'ud83dude80': '💀',  # Skull (duplicate entry)
+        'ud83eudee4': '📤',  # Outbox Tray (duplicate entry)
+        'ud83dude1f': '📟',  # Pager (duplicate entry)
+        'ud83dude41': '🕁',  # Empty Document (duplicate entry)
+        'u2639ufe0f': '☹️',  # White Frowning Face (duplicate entry)
+        'ud83dude44': '💄',  # Lipstick
+        'ud83eudea2': '🛢️',  # Oil Drum
+        'ud83dudeac': '💬',  # Speech Balloon
+        'ud83eudd79': '🛹',  # Skateboard
+        'ud83eude83': '📃',  # Page with Curl
+        'ud83eude75': '📵',  # No Mobile Phones
+        'ud83eude76': '📶',  # Antenna Bars
+        'ud83eude8e': '📎',  # Paperclip
+        'ud83eudeec': '🗬',  # Triangle Ruler
+        'ud83eudeed': '🗭',  # Protractor
+        'ud83eudeeb': '🗫',  # Label
+        'ud83eudee0': '🗠',  # Straight Ruler
+        'ud83eudee1': '🗡️',  # Dagger
+        'ud83eudd10': '🌐',  # Globe with Meridians
+        'ud83eudd28': '🌨',  # Cloud with Tornado
+        'ud83eudd11': '🌑',  # New Moon
+        'ud83eudee2': '🗢',  # Card Index Dividers
+        'ud83eudee3': '🗣️',  # Speaking Head
+        'ud83eudee2': '🗢',  # Card Index Dividers (duplicate entry)
+        'ud83eudee3': '🗣️',  # Speaking Head (duplicate entry)
+        'ud83eudee1': '🗡️',  # Dagger (duplicate entry)
+        'ud83eudd10': '🌐',  # Globe with Meridians (duplicate entry)
+        'ud83eudd36': '🌶️',  # Hot Pepper
+        'ud83eudee5': '🗥',  # Paper Tray
+        'ud83dude80': '💀',  # Skull (duplicate entry)
+        'ud83eudd2f': '🚯',  # No Littering Symbol (duplicate entry)
+        'ud83eudd20': '🚠',  # Mountain Cableway (duplicate entry)
+        'ud83eudd73': '🛳️',  # Passenger Ship (duplicate entry)
+        'ud83eudd78': '🛸',  # Flying Saucer (duplicate entry)
+        'ud83dude80': '💀',  # Skull (duplicate entry)
+        'ud83eudea2': '🛢️',  # Oil Drum (duplicate entry)
+        'ud83dude44': '💄',  # Lipstick (duplicate entry)
+        'ud83eudd25': '📥',  # Inbox Tray
+        'u200d': '',
     }
     for code, emoji_char in emoji_dict.items():
         input_string = input_string.replace(code, emoji_char)
