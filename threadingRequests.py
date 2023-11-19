@@ -83,7 +83,7 @@ threads_per_batch = usersPerBatch * 6
 
 
 # Credentials
-proxyUsername = "hadi1425000" #getProxyUsername()
+proxyUsername = "hadi14250000" #getProxyUsername()
 proxyPassword = "!zwTTdq86wLj6FM" #getProxyPassword()
 
 threads = []
