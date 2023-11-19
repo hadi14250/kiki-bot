@@ -1,6 +1,6 @@
-import json
-# print("Truncated JSON Content:\n----->\n{}\n<-----\n".format(json_content[:1500]))
+from extractInstaPostData import checkUserNamePresence
 from extractTiktokProfileData import strCountToInt
+from emojieDictionary import replaceEmojis
 
 def getTiktokLikes(input_text):
 	# Find the index of "Likes"
@@ -24,8 +24,24 @@ def getTiktokLikes(input_text):
 
 	return None
 
-def	extractTiktokLikes(scriptTag):
+def extractTextBeforeQuotes(input_string):
+    # Find the index of the first quote character
+    quote_index = input_string.find('"')
+
+    # Check if a quote is found
+    if quote_index != -1:
+        # Extract the text before the quote
+        extracted_text = input_string[:quote_index].strip()
+        return extracted_text
+    else:
+        # If no quote is found, return the original string
+        return input_string.strip()
+
+def	extractTiktokDescription(soupHtml):
 	try:
+		scriptTag = soupHtml.find("script", id="__UNIVERSAL_DATA_FOR_REHYDRATION__")
+		if not (scriptTag):
+			return (None)
 		inputText = scriptTag.contents[0][:18000]
 		startIndex = inputText.find('"description":"')
 
@@ -39,7 +55,7 @@ def	extractTiktokLikes(scriptTag):
 			if endIndex != -1:
 				# Extract the text between the markers
 				extractedText = inputText[startIndex:endIndex]
-				return (getTiktokLikes(extractedText))
+				return (extractedText)
 			else:
 				return None
 		else:
@@ -47,13 +63,32 @@ def	extractTiktokLikes(scriptTag):
 	except:
 		return (None)
 
+def extractTiktokPostContent(input_string):
+    # Find the indices of the first and last quote characters
+    start_quote_index = input_string.find('"')
+    end_quote_index = input_string.rfind('"')
 
-def	extractTiktokPostData(soupHtml, type):
-    # Find the script tag by id
-	try:
-		scriptTag = soupHtml.find("script", id="__UNIVERSAL_DATA_FOR_REHYDRATION__")
-		# print("Original\n--->{}\n\n".format(scriptTag.contents[0][:18000]))
+    # Check if both quote characters are found
+    if start_quote_index != -1 and end_quote_index != -1:
+        # Extract the text between the quotes
+        extracted_text = input_string[start_quote_index + 1:end_quote_index].strip()
+        return extracted_text
+    else:
+        # If one or both quote characters are not found, return an empty string
+        return None
+
+def	extractTiktokPostData(soupHtml, type, csvUserName):
+		extractedText = extractTiktokDescription(soupHtml)
+		if not (extractedText):
+			return (None)
 		if (type == "likeCount"):
-			return (extractTiktokLikes(scriptTag))
-	except:
-		return(None)
+			return (getTiktokLikes(extractedText))
+		elif (type == "userName"):
+			tiktokHandleText = extractTextBeforeQuotes(extractedText)
+			return (checkUserNamePresence(csvUserName, tiktokHandleText))
+		elif (type == "content"):
+			tiktokText = extractTiktokPostContent(extractedText)
+			if not (tiktokText):
+				return ("NO_CONTENT")
+			return (replaceEmojis(tiktokText))
+		return (None)

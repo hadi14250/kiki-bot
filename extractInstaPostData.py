@@ -173,10 +173,10 @@ def	extractInstaPostData(postHtml, soupHtml, type):
 		elif (type == "content"):
 			postContent = extractInstagramContent(metaTitleContent)
 			if not (postContent):
-				testPostContent = find_first_occurrence(postHtml, '{"title":')
-				testPostContent = extract_text_between_quotes (testPostContent)
-				testPostContent = replaceEmojis(testPostContent)
-				return (testPostContent)
+				instaPostContent = find_first_occurrence(postHtml, '{"title":')
+				instaPostContent = extract_text_between_quotes (instaPostContent)
+				instaPostContent = replaceEmojis(instaPostContent)
+				return (instaPostContent)
 			return (replaceEmojis(postContent))
 		elif (type == "postDate"):
 			postDate = extractInstagramDate(formattedMetaDescContent)
