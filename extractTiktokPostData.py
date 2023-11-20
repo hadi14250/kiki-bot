@@ -1,6 +1,7 @@
 from extractInstaPostData import checkUserNamePresence
 from extractTiktokProfileData import strCountToInt
 from emojieDictionary import replaceEmojis
+from datetime import datetime, timedelta
 
 def getTiktokLikes(input_text):
 	# Find the index of "Likes"
@@ -77,6 +78,34 @@ def extractTiktokPostContent(input_string):
         # If one or both quote characters are not found, return an empty string
         return None
 
+def parseTiktokDate(dateText):
+
+    if dateText is None:
+        return None
+    # Get the current date
+    current_date = datetime.now()
+
+    if '-' in dateText:
+        # If the date format is MM-DD
+        date_obj = datetime.strptime(dateText, "%m-%d").replace(year=current_date.year)
+    elif 'd ago' in dateText:
+        # If the date format is X days ago
+        days_ago = int(dateText.split('d ago')[0])
+        date_obj = current_date - timedelta(days=days_ago)
+    else:
+        # Handle other formats if needed
+        date_obj = None
+
+    return date_obj.date() if date_obj else None
+
+def findTiktokDate(soupHtml):
+	# Find the span element containing the date
+	dateSpan = soupHtml.select_one('span[data-e2e="browser-nickname"] span:last-child')
+
+	# Extract the date text
+	date_text = dateSpan.text if dateSpan else None
+	return (parseTiktokDate(date_text))
+
 def	extractTiktokPostData(soupHtml, type, csvUserName):
 		extractedText = extractTiktokDescription(soupHtml)
 		if not (extractedText):
@@ -91,4 +120,6 @@ def	extractTiktokPostData(soupHtml, type, csvUserName):
 			if not (tiktokText):
 				return ("NO_CONTENT")
 			return (replaceEmojis(tiktokText))
+		elif (type == "postDate"):
+			return (findTiktokDate(soupHtml))
 		return (None)

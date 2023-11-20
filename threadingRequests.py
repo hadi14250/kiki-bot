@@ -157,4 +157,5 @@ for user in user_objects[:userLimit]:
 	user.tiktokPost.postLike = extractTiktokPostData(user.tiktokPost.soupHtml, "likeCount", user.tiktokProfile.csvUserName)
 	user.tiktokPost.excractedUserName = extractTiktokPostData(user.tiktokPost.soupHtml, "userName", user.tiktokProfile.csvUserName)
 	user.tiktokPost.postText = extractTiktokPostData(user.tiktokPost.soupHtml, "content", user.tiktokProfile.csvUserName)
+	user.tiktokPost.postDate = extractTiktokPostData(user.tiktokPost.soupHtml, "postDate", user.tiktokProfile.csvUserName)
 	printUserInfo(user, "testing.log", "testingLogs")
