@@ -2,6 +2,7 @@ from extractInstaPostData import checkUserNamePresence
 from extractTiktokProfileData import strCountToInt
 from emojieDictionary import replaceEmojis
 from datetime import datetime, timedelta
+import json
 
 def getTiktokLikes(input_text):
 	# Find the index of "Likes"
@@ -106,20 +107,43 @@ def findTiktokDate(soupHtml):
 	date_text = dateSpan.text if dateSpan else None
 	return (parseTiktokDate(date_text))
 
-def	extractTiktokPostData(soupHtml, type, csvUserName):
-		extractedText = extractTiktokDescription(soupHtml)
-		if not (extractedText):
+
+def	getTiktokCaption(soupHtml):
+	try:
+		if not (soupHtml):
 			return (None)
-		if (type == "likeCount"):
-			return (getTiktokLikes(extractedText))
-		elif (type == "userName"):
-			tiktokHandleText = extractTextBeforeQuotes(extractedText)
-			return (checkUserNamePresence(csvUserName, tiktokHandleText))
-		elif (type == "content"):
-			tiktokText = extractTiktokPostContent(extractedText)
+		scriptTag = soupHtml.find('meta', {'property': 'og:description'})
+		if not (scriptTag):
+			return (None)
+		tagContent = scriptTag.get('content')
+		return (tagContent)
+	except:
+		return (None)
+
+def	findCaptionUsingHtml(htmlText):
+	startIndex = htmlText.find('"shareMeta":{')
+	endIndex = htmlText.find('}', startIndex) + 1
+	shareMetaJson = htmlText[startIndex:endIndex]
+	
+	descIndex = shareMetaJson.find('"desc":')
+	startIndex = shareMetaJson.find(':', descIndex) + 1
+	endIndex = shareMetaJson.find(',', startIndex)
+	descText = shareMetaJson[startIndex:endIndex].strip('"')
+	if (descText):
+		return (descText)
+	else:
+		return (None)
+
+def	extractTiktokPostData(soupHtml, type, csvUserName, htmlText):
+		if not (soupHtml) or not (htmlText) or not (csvUserName):
+			return (None)
+		# --------------------
+		if (type == "content"):
+			tiktokText = getTiktokCaption(soupHtml)
 			if not (tiktokText):
-				return ("NO_CONTENT")
+				tiktokText = findCaptionUsingHtml(htmlText)
 			return (replaceEmojis(tiktokText))
-		elif (type == "postDate"):
-			return (findTiktokDate(soupHtml))
+		# --------------------
+		elif (type == "userName"):
+			return (checkUserNamePresence(csvUserName, htmlText))
 		return (None)

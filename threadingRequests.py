@@ -13,6 +13,7 @@ from testFunctions import printUserInfo, printHtml
 from extractInstaProfileData import getInstaFollowers
 from extractTiktokProfileData import getTiktokFollowers
 from extractTiktokPostData import extractTiktokPostData
+from extractTwitterProfileData import extractTwitterUserInteractionCount
 
 def deleteHtmlFiles():
     curentDir = os.getcwd()
@@ -39,6 +40,7 @@ def make_request(userSocialMeida, payload, filename, proxyUsername, proxyPassWor
                 'https://realtime.oxylabs.io/v1/queries',
                 auth=(proxyUsername, proxyPassWord),
                 json=payload,
+                timeout=120
             )
             response.raise_for_status()
             userSocialMeida.formatHtmlResponse(response)
@@ -76,15 +78,15 @@ def run_threads(thread_queue, num_threads_to_run):
 
 deleteHtmlFiles()
 
-userLimit = 12 # (1 user has 6 requests or 6 threads)
+userLimit = 70 # (1 user has 6 requests or 6 threads)
 usersPerBatch = 50
 
 threads_per_batch = usersPerBatch * 6
 
 
 # Credentials
-proxyUsername = getProxyUsername()
-proxyPassword = getProxyPassword()
+proxyUsername = "hadi14250" #getProxyUsername()
+proxyPassword = "!zwTTdq86wLj6FM" #getProxyPassword()
 
 threads = []
 for user in user_objects[:userLimit]:
@@ -148,14 +150,19 @@ while threads:
 
 
 for user in user_objects[:userLimit]:
-	user.instaProfile.followers = getInstaFollowers(user.instaProfile.soupHtml)
-	user.instaPost.excractedUserName = checkUserNamePresence(user.instaProfile.csvUserName, user.instaPost.html)
-	user.instaPost.postLike = extractInstaPostData(user.instaPost.html, user.instaPost.soupHtml, "likeCount")
-	user.instaPost.postText = extractInstaPostData(user.instaPost.html, user.instaPost.soupHtml, "content")
-	user.instaPost.postDate = extractInstaPostData(user.instaPost.html, user.instaPost.soupHtml, "postDate")
-	user.tiktokProfile.followers = getTiktokFollowers(user.tiktokProfile.soupHtml)
-	user.tiktokPost.postLike = extractTiktokPostData(user.tiktokPost.soupHtml, "likeCount", user.tiktokProfile.csvUserName)
-	user.tiktokPost.excractedUserName = extractTiktokPostData(user.tiktokPost.soupHtml, "userName", user.tiktokProfile.csvUserName)
-	user.tiktokPost.postText = extractTiktokPostData(user.tiktokPost.soupHtml, "content", user.tiktokProfile.csvUserName)
-	user.tiktokPost.postDate = extractTiktokPostData(user.tiktokPost.soupHtml, "postDate", user.tiktokProfile.csvUserName)
-	printUserInfo(user, "testing.log", "testingLogs")
+    user.instaProfile.followers = getInstaFollowers(user.instaProfile.soupHtml)
+    user.instaPost.excractedUserName = checkUserNamePresence(user.instaProfile.csvUserName, user.instaPost.html)
+    user.instaPost.postText = extractInstaPostData(user.instaPost.html, user.instaPost.soupHtml, "content")
+
+    user.tiktokProfile.followers = getTiktokFollowers(user.tiktokProfile.soupHtml, user.tiktokProfile.html)
+    user.tiktokPost.excractedUserName = extractTiktokPostData(user.tiktokPost.soupHtml, "userName", user.tiktokProfile.csvUserName, user.tiktokPost.html)
+    user.tiktokPost.postText = extractTiktokPostData(user.tiktokPost.soupHtml, "content", user.tiktokProfile.csvUserName, user.tiktokPost.html)
+
+    user.twitterProfile.followers = extractTwitterUserInteractionCount(user.twitterProfile.soupHtml, "followers")
+
+	# user.instaPost.postLike = extractInstaPostData(user.instaPost.html, user.instaPost.soupHtml, "likeCount")
+	# user.instaPost.postDate = extractInstaPostData(user.instaPost.html, user.instaPost.soupHtml, "postDate")
+	# user.tiktokPost.postLike = extractTiktokPostData(user.tiktokPost.soupHtml, "likeCount", user.tiktokProfile.csvUserName)
+	# user.tiktokPost.postDate = extractTiktokPostData(user.tiktokPost.soupHtml, "postDate", user.tiktokProfile.csvUserName)
+
+    printUserInfo(user, "testing.log", "testingLogs")

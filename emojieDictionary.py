@@ -1,4 +1,6 @@
 def replaceEmojis(input_string):
+    if not (input_string):
+        return (None)
     """
     Replaces emoji codes in the input string with actual emojis.
     """
