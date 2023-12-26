@@ -14,6 +14,9 @@ from extractInstaProfileData import getInstaFollowers
 from extractTiktokProfileData import getTiktokFollowers
 from extractTiktokPostData import extractTiktokPostData
 from extractTwitterProfileData import extractTwitterUserInteractionCount
+from extractTweet import getTweet
+from sequenceMatcher import get_similarity_percentage
+from calculateTotalReward import calculateTotalReward
 
 def deleteHtmlFiles():
     curentDir = os.getcwd()
@@ -78,8 +81,9 @@ def run_threads(thread_queue, num_threads_to_run):
 
 deleteHtmlFiles()
 
-userLimit = 70 # (1 user has 6 requests or 6 threads)
+userLimit = 5 # (1 user has 6 requests or 6 threads)
 usersPerBatch = 50
+originalPostContent = "🌟 Calling all adventurers! The quest to uncover SCOM's elusive dad, the one and only Reese (aka our dev's dad), is officially underway! 🚀 Join the expedition and be a part of the excitement as we unravel the mystery surrounding his whereabouts. 🕵️‍♂️ Your contribution could be the"
 
 threads_per_batch = usersPerBatch * 6
 
@@ -90,64 +94,66 @@ proxyPassword = "!zwTTdq86wLj6FM" #getProxyPassword()
 
 threads = []
 for user in user_objects[:userLimit]:
-    instagramProfileThread = create_thread(
-         user.instaProfile,
-        {"source": "universal", "url": user.instaProfile.profileUrl, "render": "html"},
-        'instagram_profile_{}.html'.format(user.fullName),
-		proxyUsername,
-		proxyPassword
-    )
-    threads.append(instagramProfileThread)
+    if (user.instaProfile) and (user.instaPost) and (user.instaProfile != "nan") and (user.instaPost != "nan") and (user.instaProfile.profileUrl) and (user.instaProfile.profileUrl != "nan") and (user.instaPost.postUrl) and (user.instaPost.postUrl != "nan"):
+        instagramProfileThread = create_thread(
+            user.instaProfile,
+            {"source": "universal", "url": user.instaProfile.profileUrl, "render": "html"},
+            'instagram_profile_{}.html'.format(user.fullName),
+            proxyUsername,
+            proxyPassword
+        )
+        threads.append(instagramProfileThread)
+        instagramPostThread = create_thread(
+            user.instaPost,
+            {"source": "universal", "url": user.instaPost.postUrl, "render": "html"},
+            'instagram_post_{}.html'.format(user.fullName),
+            proxyUsername,
+            proxyPassword
+        )
+        threads.append(instagramPostThread)
 
-    instagramPostThread = create_thread(
-         user.instaPost,
-        {"source": "universal", "url": user.instaPost.postUrl, "render": "html"},
-        'instagram_post_{}.html'.format(user.fullName),
-		proxyUsername,
-		proxyPassword
-    )
-    threads.append(instagramPostThread)
+    if (user.tiktokProfile) and (user.tiktokPost) and (user.tiktokProfile != "nan") and (user.tiktokPost != "nan") and (user.tiktokProfile.profileUrl) and (user.tiktokProfile.profileUrl != "nan") and (user.tiktokPost.postUrl) and (user.tiktokPost.postUrl != "nan"):
+        tiktokProfileThread = create_thread(
+            user.tiktokProfile,
+            {"source": "universal", "url": user.tiktokProfile.profileUrl, "render": "html"},
+            'tiktok_profile_{}.html'.format(user.fullName),
+            proxyUsername,
+            proxyPassword
+        )
+        threads.append(tiktokProfileThread)
+        tiktokPostThread = create_thread(
+            user.tiktokPost,
+            {"source": "universal", "url": user.tiktokPost.postUrl, "render": "html"},
+            'tiktok_post_{}.html'.format(user.fullName),
+            proxyUsername,
+            proxyPassword
+        )
+        threads.append(tiktokPostThread)
 
-    tiktokProfileThread = create_thread(
-         user.tiktokProfile,
-        {"source": "universal", "url": user.tiktokProfile.profileUrl, "render": "html"},
-        'tiktok_profile_{}.html'.format(user.fullName),
-		proxyUsername,
-		proxyPassword
-    )
-    threads.append(tiktokProfileThread)
+    if (user.twitterProfile) and (user.tweet) and (user.twitterProfile != "nan") and (user.tweet != "nan") and (user.twitterProfile.profileUrl) and (user.twitterProfile.profileUrl != "nan") and (user.tweet.postUrl) and (user.tweet.postUrl != "nan"):
+        twitterProfileThread = create_thread(
+            user.twitterProfile,
+            {"source": "universal", "url": user.twitterProfile.profileUrl, "render": "html"},
+            'twitter_profile_{}.html'.format(user.fullName),
+            proxyUsername,
+            proxyPassword
+        )
+        threads.append(twitterProfileThread)
 
-    tiktokPostThread = create_thread(
-         user.tiktokPost,
-        {"source": "universal", "url": user.tiktokPost.postUrl, "render": "html"},
-        'tiktok_post_{}.html'.format(user.fullName),
-		proxyUsername,
-		proxyPassword
-    )
-    threads.append(tiktokPostThread)
-
-    twitterProfileThread = create_thread(
-         user.twitterProfile,
-        {"source": "universal", "url": user.twitterProfile.profileUrl, "render": "html"},
-        'twitter_profile_{}.html'.format(user.fullName),
-		proxyUsername,
-		proxyPassword
-    )
-    threads.append(twitterProfileThread)
-
-    twitterPostThread = create_thread(
-         user.tweet,
-        {"source": "universal", "url": user.tweet.postUrl, "render": "html"},
-        'tweet_{}.html'.format(user.fullName),
-		proxyUsername,
-		proxyPassword
-    )
-    threads.append(twitterPostThread)
+        twitterPostThread = create_thread(
+            user.tweet,
+            {"source": "universal", "url": user.tweet.postUrl, "render": "html"},
+            'tweet_{}.html'.format(user.fullName),
+            proxyUsername,
+            proxyPassword
+        )
+        threads.append(twitterPostThread)
 
 
 while threads:
     run_threads(threads, threads_per_batch)
 
+user_data_list = []
 
 for user in user_objects[:userLimit]:
     user.instaProfile.followers = getInstaFollowers(user.instaProfile.soupHtml)
@@ -159,6 +165,26 @@ for user in user_objects[:userLimit]:
     user.tiktokPost.postText = extractTiktokPostData(user.tiktokPost.soupHtml, "content", user.tiktokProfile.csvUserName, user.tiktokPost.html)
 
     user.twitterProfile.followers = extractTwitterUserInteractionCount(user.twitterProfile.soupHtml, "followers")
+    user.tweet.postText = getTweet(user.tweet.soupHtml)
+
+    user.instaPost.contentSimilarity = get_similarity_percentage(user.instaPost.postText, originalPostContent, "insta")
+    user.tiktokPost.contentSimilarity = get_similarity_percentage(user.tiktokPost.postText, originalPostContent, "tiktok")
+    user.tweet.contentSimilarity = get_similarity_percentage(user.tweet.postText, originalPostContent, "twitter")
+
+    user.totalPayment = calculateTotalReward(user)
+    # # Define reward conditions based on followers count
+    # reward = user.instaProfile.followers % 2 == 0
+    # reward_amount = user.instaProfile.followers / 100
+
+    # # Create a dictionary for each user
+    # user_data = {
+    #     "scomuser": user.instaProfile.followers,
+    #     "reward": reward,
+    #     "rewardAmount": reward_amount
+    # }
+
+    # # Add the dictionary to the list
+    # user_data_list.append(user_data)
 
 	# user.instaPost.postLike = extractInstaPostData(user.instaPost.html, user.instaPost.soupHtml, "likeCount")
 	# user.instaPost.postDate = extractInstaPostData(user.instaPost.html, user.instaPost.soupHtml, "postDate")
@@ -166,3 +192,5 @@ for user in user_objects[:userLimit]:
 	# user.tiktokPost.postDate = extractTiktokPostData(user.tiktokPost.soupHtml, "postDate", user.tiktokProfile.csvUserName)
 
     printUserInfo(user, "testing.log", "testingLogs")
+
+# print(user_data_list)

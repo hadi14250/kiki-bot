@@ -29,3 +29,16 @@ def constructTwitterUrl(username):
         return None
     url = "https://x.com/{}{}".format(username, twitterUrlArg)
     return url
+
+def constructUrl(username, type):
+    if (pd.isna(username)) or not (username) or not (type):
+        return None
+    if (type == "Instagram"):
+        url = constructInstagramUrl(username)
+    elif (type == "TikTok"):
+        url = constructTiktokUrl(username)
+    elif (type == "X"):
+        url = constructTwitterUrl(username)
+    else:
+        return (None)
+    return (url)

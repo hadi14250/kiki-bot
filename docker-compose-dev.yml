@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+
+  dbs:
+    env_file:
+      - .env
+
+    container_name: dbs
+    image: postgres:16.1-bookworm
+
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+      PG_DATA: /var/lib/postgresql/data
+
+    restart: unless-stopped
+
+    expose:
+      - 5432
+
+    networks:
+      - dbsn
+
+    volumes:
+      - data-dbs:/var/lib/postgresql/data
+
+  api:
+    env_file:
+      - .env
+
+    environment:
+      NODE_ENV: development
+
+    container_name: api
+
+    image: ghcr.io/scomcoin/scom-api:1.1
+
+    restart: unless-stopped
+
+    ports:
+      - 3000:3000
+
+    networks:
+      - apin
+      - dbsn
+      - redisn
+
+    depends_on:
+      - dbs
+      - redis
+
+    command: ["pm2-runtime","process.json"]
+
+
+  redis:
+    image: redis:7.2.3-bookworm
+    container_name: redis
+
+    expose:
+      - 6379
+
+    restart: unless-stopped
+
+    networks:
+      - apin
+      - redisn
+
+    volumes:
+      - data-redis:/data
+
+
+networks:
+
+  dbsn:
+    name: dbs
+
+  apin:
+    name: api
+
+  redisn:
+    name: redis
+
+
+
+volumes:
+  data-dbs:
+  data-redis:

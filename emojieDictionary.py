@@ -1,3 +1,5 @@
+import re
+
 def replaceEmojis(input_string):
     if not (input_string):
         return (None)
@@ -5,6 +7,14 @@ def replaceEmojis(input_string):
     Replaces emoji codes in the input string with actual emojis.
     """
     emoji_dict = {
+        'ud83dudd75ufe0fu2642ufe0f': '🕵️‍♂️',
+        'ud83cudf1f': '🌟',
+        'u266c': '🎵',
+        'ud83eudd32ud83cudffb': '🤲🏻',
+        'ud83cudde6ud83cuddea': '🇦🇪',
+        'u2665': '♥',
+        'u2018': '‘',
+        'u2019': '’',
         'u2764ufe0f': '❤️',
         'ud83dude02': '😂',
         'ud83dude0a': '😊',
@@ -303,7 +313,7 @@ def replaceEmojis(input_string):
         'ud83dudc49': '👉',  # Backhand Index Pointing Right
         'ud83dudce5': '📍',  # Round Pushpin
         'ud83eudd23': '🤣',  # Rolling on the Floor Laughing
-        'ud83dudd25': '💥',  # Collision
+        'ud83dudd25': '🔥',  # Collision
         'ud83euddd1u200d': '🧑‍', #winking
         'ud83dude80': '🚀',  # Rocket
         'ud83dudc47': '👇',  # Backhand Index Pointing Down
@@ -368,12 +378,11 @@ def replaceEmojis(input_string):
         'ud83eudd20': '🚠',  # Mountain Cableway
         'ud83eudd73': '🛳️',  # Passenger Ship
         'ud83eudd78': '🛸',  # Flying Saucer
-        'ud83dude80': '💀',  # Skull
+        'ud83dude80': '🚀',  # Rocket
         'ud83eudee4': '📤',  # Outbox Tray
         'ud83dude1f': '📟',  # Pager
         'ud83dude41': '🕁',  # Empty Document
         'u2639ufe0f': '☹️',  # White Frowning Face
-        'ud83dude80': '💀',  # Skull (duplicate entry)
         'ud83eudee4': '📤',  # Outbox Tray (duplicate entry)
         'ud83dude1f': '📟',  # Pager (duplicate entry)
         'ud83dude41': '🕁',  # Empty Document (duplicate entry)
@@ -402,12 +411,10 @@ def replaceEmojis(input_string):
         'ud83eudd10': '🌐',  # Globe with Meridians (duplicate entry)
         'ud83eudd36': '🌶️',  # Hot Pepper
         'ud83eudee5': '🗥',  # Paper Tray
-        'ud83dude80': '💀',  # Skull (duplicate entry)
         'ud83eudd2f': '🚯',  # No Littering Symbol (duplicate entry)
         'ud83eudd20': '🚠',  # Mountain Cableway (duplicate entry)
         'ud83eudd73': '🛳️',  # Passenger Ship (duplicate entry)
         'ud83eudd78': '🛸',  # Flying Saucer (duplicate entry)
-        'ud83dude80': '💀',  # Skull (duplicate entry)
         'ud83eudea2': '🛢️',  # Oil Drum (duplicate entry)
         'ud83dude44': '💄',  # Lipstick (duplicate entry)
         'ud83eudd25': '📥',  # Inbox Tray
@@ -415,5 +422,9 @@ def replaceEmojis(input_string):
     }
     for code, emoji_char in emoji_dict.items():
         input_string = input_string.replace(code, emoji_char)
-
+    
+    pattern = re.compile(r'ud83[^\s]*')
+    
+    # Replace matched substrings with an empty string
+    input_string = re.sub(pattern, ' ', input_string)
     return input_string

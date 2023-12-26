@@ -57,6 +57,7 @@ class SocialMediaPost:
 		self.postDate			= None
 		self.payment			= 0
 		self.proxyJobID		= None
+		self.contentSimilarity = 0
 
 	def setScrapedData(self, type):
 		if (type == "instagram"):
@@ -76,7 +77,7 @@ class SocialMediaPost:
 class User:
 	def __init__(self, user_num, full_name, instaProfile, instaPost,
 			  		tiktokProfile, tiktokPost, twitterProfile,
-					tweet, walletAdd):
+					tweet, walletAdd, scomUserName):
 		self.UserNum		= user_num
 		self.fullName		= full_name
 		self.instaProfile	= instaProfile
@@ -86,6 +87,9 @@ class User:
 		self.twitterProfile	= twitterProfile
 		self.tweet			= tweet
 		self.walletAdd		= walletAdd
+		self.totalPayment = 0
+		self.scomUserName = scomUserName
+		
 
 # Load the Excel file
 file_name = "user_data.xlsx"
@@ -126,7 +130,8 @@ for index, row in df.iterrows():
 		tiktokPost		= tiktokPost,
         twitterProfile	= twitterProfile,
 		tweet			= tweet,
-        walletAdd		= row["Wallet Address"]
+        walletAdd		= row["Wallet Address"],
+		scomUserName = row["ScomUserName"]
     )
     user_objects.append(user_object)
 

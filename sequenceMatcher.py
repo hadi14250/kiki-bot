@@ -1,8 +1,25 @@
 from difflib import SequenceMatcher
+import emoji
 
-def get_similarity_percentage(sentence1, sentence2):
+# strips emojis for twitter because twitter strips emojies in html
+def stripEmojis(originalContentPost):
+    return ''.join(c for c in originalContentPost if not emoji.is_emoji(c))
+
+def stripWhitespaces(inputString):
+    return inputString.replace(" ", "").replace("\t", "").replace("\n", "").replace("\r", "")
+
+
+def get_similarity_percentage(userPost, originalContentPost, type):
+    if not (userPost) or not (originalContentPost):
+        return ("0.0%")
+    # if (type == "twitter"):
+    originalContentPost = stripEmojis(originalContentPost)
+
+    originalContentPost = stripWhitespaces(originalContentPost)
+    userPost = stripWhitespaces(userPost)
+    
     # Create a SequenceMatcher object
-    seq_matcher = SequenceMatcher(None, sentence1, sentence2)
+    seq_matcher = SequenceMatcher(None, userPost, originalContentPost)
 
     # Get the ratio of similarity (a float between 0 and 1)
     similarity_ratio = seq_matcher.ratio()
@@ -11,10 +28,3 @@ def get_similarity_percentage(sentence1, sentence2):
     similarity_percentage = similarity_ratio * 100
 
     return similarity_percentage
-
-# Example usage
-sentence1 = 'Koimoi.com on Instagram: "u0040saratendulkar pours her heart into a birthday wish for her world, her Mom u0040tendulkaranjali u2764ufe0fud83eudef6 #saratendulkar #anjalitendulkar #koimoi Sara Tendulkar, Anjali Tendulkar, Birthday Wish, Mother Daughter'
-sentence2 = 'u0040saratendulkar pours her heart into a birthday wish for her world, her Mom u0040tendulkaranjali u2764ufe0fud83eudef6 #saratendulkar #anjalitendulkar #koimoi Sara Tendulkar, Anjali Tendulkar, Birthday Wish, Mother Daughter'
-percentage = get_similarity_percentage(sentence1, sentence2)
-
-print(f"Similarity Percentage: {percentage}%")

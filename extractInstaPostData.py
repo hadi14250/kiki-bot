@@ -109,10 +109,13 @@ def formatInput(input_string):
 
 # check for the presence of the username from the excel sheet in the post html template
 def checkUserNamePresence(csvUsername, postHtmlText):
-	if csvUsername in postHtmlText:
-		return (csvUsername)
-	else:
-		return ("NOT_A_MATCH")
+    if not csvUsername or csvUsername.lower() == "nan" or not postHtmlText:
+        return None
+    if csvUsername.lower() in postHtmlText.lower():
+        return csvUsername
+    else:
+        return None
+
 
 #returns the first occurance of a string
 def find_first_occurrence(main_string, sub_string):
