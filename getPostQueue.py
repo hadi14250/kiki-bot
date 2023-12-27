@@ -17,73 +17,33 @@ from extractTwitterProfileData import extractTwitterUserInteractionCount
 from extractTweet import getTweet
 from sequenceMatcher import get_similarity_percentage
 from calculateTotalReward import calculateTotalReward
-from addInvalidUsersToExcelSheet import addInvalidPostsToExcelSheet
+from addInvalidUsersToExcelSheet import addInvalidUsersToExcelSheet
+from dotenv import load_dotenv
+from getCredentials import getBotJwtTokenEnv
+
+load_dotenv()
+
+jwt_token = getBotJwtTokenEnv()
+url = "http://localhost:3000/api/bot/posts"
+
+headers = {
+    "Authorization": f"Bearer {jwt_token}",
+    "Content-Type": "application/json",
+}
 
 def getPostQueue():
-    response_json = [
-    {
-        "scomuser": "23",
-        "name": "kiki.crypto",
-        "id": "123",
-        "type": "Instagram",
-        "followers": "0",
-        "url": "https://www.instagram.com/p/C1J8y4GSUxs/?igsh=MW5wOXM4ejEzcWNjbA==",
-        "instaStory": "False",
-        "campaing": "string"
-    },
-    {
-        "scomuser": "23",
-        "name": "kiki.crypto",
-        "id": "123",
-        "type": "Instagram",
-        "followers": "1",
-        "url": "https://www.instagram.com/p/C1J8y4GSUxs/?igsh=MW5wOXM4ejEzcWNjbA==",
-        "instaStory": "False",
-        "campaing": "string"
-    },
-    {
-        "scomuser": "23",
-        "name": "kiki.crypto",
-        "id": "123",
-        "type": "Instagram",
-        "followers": "299",
-        "url": "https://www.instagram.com/p/C1J8y4GSUxs/?igsh=MW5wOXM4ejEzcWNjbA==",
-        "instaStory": "False",
-        "campaing": "string"
-    },
-    {
-        "scomuser": "23",
-        "name": "kiki.crypto",
-        "id": "123",
-        "type": "Instagram",
-        "followers": "301",
-        "url": "https://www.instagram.com/p/C1J8y4GSUxs/?igsh=MW5wOXM4ejEzcWNjbA==",
-        "instaStory": "False",
-        "campaing": "string"
-    },
-    {
-        "scomuser": "23",
-        "name": "kiki.crypto",
-        "id": "123",
-        "type": "Instagram",
-        "followers": "1340",
-        "url": "https://www.instagram.com/p/C1J8y4GSUxs/?igsh=MW5wOXM4ejEzcWNjbA==",
-        "instaStory": "False",
-        "campaing": "string"
-    },
-    {
-        "scomuser": "1",
-        "name": "hadi1557490",
-        "id": "123",
-        "type": "X",
-        "followers": "0",
-        "url": "https://twitter.com/hadi1557490/status/1738173749755589088?t=w62sdy1AFdGMbGi1RrwHcA&s=19",
-        "instaStory": "False",
-        "campaing": "string",
-    },
-    ]
-    return (response_json)
-
+    try:
+        response = requests.get(url, headers=headers)
+        if (response.status_code == 200):
+            post_data = response.json()
+            return (post_data)
+        else:
+            response.raise_for_status()
+            print(response.text)
+            return(None)
+    except requests.exceptions.RequestException as e:
+        print(f"Error: {e}")
+        return (None)
 
 
 # ----------------> Functions <----------------
@@ -138,8 +98,8 @@ def run_threads(thread_queue, num_threads_to_run):
 
 
 # Credentials
-proxyUsername = "hadi14250" #getProxyUsername()
-proxyPassword = "!zwTTdq86wLj6FM" #getProxyPassword()
+proxyUsername = getProxyUsername()
+proxyPassword = getProxyPassword()
 
 def runPostThreads(parsedPosts, threads_per_batch):
     threads = []
@@ -157,14 +117,15 @@ def runPostThreads(parsedPosts, threads_per_batch):
 
 
 def calcPaymentFollowers(followers, contentSimilarity):
+    print("Remember to change the followers back to 300")
     followers = int(followers) if followers else 0  # Convert to int if followers is not None
     contentSimilarity = int(contentSimilarity) if str(contentSimilarity).replace('.', '').isdigit() else 0  # Convert to int if contentSimilarity is a digit
     
-    if (contentSimilarity < 85) or ((followers) and (followers < 300)):
+    if (contentSimilarity < 85) or ((followers) and (followers < 0)):
         return (0)
-    if not (followers):
+    if (followers == None):
         return (10)
-    if (followers >= 300) and (followers <= 1000):
+    if (followers >= 0) and (followers <= 1000):
         return (10)
     elif (followers >= 1000) and (followers <= 5000):
         return (25)
@@ -214,14 +175,22 @@ def parsePosts(parsedPosts, originalPostContent):
 
         if (post.totalPayment > 0):
             post.validated = True
-        else:
-            try:
-                addInvalidPostsToExcelSheet(post)
-            except:
-                print("Couldn't add user to excel sheet")
+        # else:
+        #     try:
+        #         addInvalidPostsToExcelSheet(post)
+        #     except:
+                # print("Couldn't add user to excel sheet")
         posts.append({
         "id": post.id,
         "reward": post.validated,
         "rewardAmount": post.totalPayment
         })
     return (posts)
+
+def sendPostsToDB(postsToDB):
+    response = requests.post(url, data=json.dumps(postsToDB), headers=headers)
+    if (response.status_code == 200) or (response.status_code == 201):
+        print("Posts added successfully!")
+    else:
+        print(f"Request failed with status code: {response.status_code}")
+        print(response.text)

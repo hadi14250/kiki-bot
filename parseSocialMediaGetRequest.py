@@ -32,7 +32,7 @@ def parseSocialMediaGetRequest(response_json):
     for item in response_json:
         scomuserNum = item.get("scomuser")
         user_id = item.get("id")
-        socialMedia = item.get("name")
+        socialMedia = item.get("account")
         socialMediaType = item.get("type")
         url = constructUrl(socialMedia, socialMediaType)
         scomUserName = "scomuser-" + str(scomuserNum) if scomuserNum is not None else None

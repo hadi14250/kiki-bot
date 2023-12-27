@@ -18,35 +18,31 @@ from extractTweet import getTweet
 from sequenceMatcher import get_similarity_percentage
 from calculateTotalReward import calculateTotalReward
 from addInvalidUsersToExcelSheet import addInvalidUsersToExcelSheet
+from dotenv import load_dotenv
+from getCredentials import getBotJwtTokenEnv
+
+load_dotenv()
+jwt_token = getBotJwtTokenEnv()
+url = "http://localhost:3000/api/bot/social"
+
+headers = {
+    "Authorization": f"Bearer {jwt_token}",
+    "Content-Type": "application/json",
+}
 
 def getSocialMediaQueue():
-    response_json = [
-        {
-            "scomuser": "1",
-            "id": "123",
-            "name": "kiki.crypto",
-            "type": "Instagram"
-        },
-        {
-            "scomuser": "1",
-            "id": "123",
-            "name": "hadi1557490",
-            "type": "X"
-        },
-        {
-            "scomuser": "2",
-            "id": "321",
-            "name": "malescall",
-            "type": "Instagram"
-        },
-        {
-            "scomuser": "2",
-            "id": "321",
-            "name": "thezachchoi",
-            "type": "TikTok"
-        },
-    ]
-    return (response_json)
+    try:
+        response = requests.get(url, headers=headers)
+        if (response.status_code == 200):
+            social_data = response.json()
+            return (social_data)
+        else:
+            response.raise_for_status()
+            print(response.text)
+            return(None)
+    except requests.exceptions.RequestException as e:
+        print(f"Error: {e}")
+        return (None)
 
 # ----------------> Functions <----------------
 
@@ -100,8 +96,8 @@ def run_threads(thread_queue, num_threads_to_run):
 
 
 # Credentials
-proxyUsername = "hadi14250" #getProxyUsername()
-proxyPassword = "!zwTTdq86wLj6FM" #getProxyPassword()
+proxyUsername = getProxyUsername()
+proxyPassword = getProxyPassword()
 
 def runSocialMediaThreads(parsedSocialMediaAccounts, threads_per_batch):
     threads = []
@@ -116,6 +112,9 @@ def runSocialMediaThreads(parsedSocialMediaAccounts, threads_per_batch):
 
     while threads:
         run_threads(threads, threads_per_batch)
+
+def validateBeforeSending(SocialMediaAccountsToDB):
+    print("Dont forget to adad a function in parseFollowers() to validate the object before sending to db")
 
 def parseFollowers(parsedSocialMediaAccounts):
     SocialMediaAccountsToDB = []
@@ -132,27 +131,24 @@ def parseFollowers(parsedSocialMediaAccounts):
             user.validated = True
         else:
             try:
+                # adding this because incase followers are none db doesnt accept them
+                user.followers = 0
                 addInvalidUsersToExcelSheet(user)
             except:
-                print("Couldn't add user to excel sheet")
+                print("Couldn't add user(s) to excel sheet")
 
         SocialMediaAccountsToDB.append({
         "id": user.id,
         "valid": user.validated,
         "followers": user.followers
         })
+        validateBeforeSending(SocialMediaAccountsToDB)
     return (SocialMediaAccountsToDB)
 
-# # Send POST request with user data
-# url = "http://localhost:3000/api/bot/social"
-# headers = {
-#     "Content-Type": "application/json"
-# }
-
-# response = requests.post(url, data=json.dumps(SocialMediaAccountsToDB), headers=headers)
-# # Check the response status
-# if response.status_code == 200:
-#     print("Users added successfully!")
-# else:
-#     print(f"Request failed with status code: {response.status_code}")
-#     print(response.text)
+def sendSocialMediaToDB(SocialMediaAccountsToDB):
+    response = requests.post(url, data=json.dumps(SocialMediaAccountsToDB), headers=headers)
+    if (response.status_code == 200) or (response.status_code == 201):
+        print("Users added successfully!")
+    else:
+        print(f"Request failed with status code: {response.status_code}")
+        print(response.text)

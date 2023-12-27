@@ -35,7 +35,7 @@ services:
 
     container_name: api
 
-    image: ghcr.io/scomcoin/scom-api:1.1
+    image: ghcr.io/scomcoin/scom-api:1.5.1
 
     restart: unless-stopped
 
