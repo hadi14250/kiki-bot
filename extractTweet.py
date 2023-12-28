@@ -9,6 +9,6 @@ def getTweet(soupHtml):
         text_spans = [span.get_text(strip=True) for span in tweet_text_div.find_all('span') if span.get_text(strip=True) and not span.find('img')]
         
         # Join the text spans with spaces
-        tweet_text = ' '.join(text_spans)
+        tweet_text = ''.join(text_spans)
         return (replaceEmojis(tweet_text))
 

@@ -17,7 +17,7 @@ def get_similarity_percentage(userPost, originalContentPost, type):
 
     originalContentPost = stripWhitespaces(originalContentPost)
     userPost = stripWhitespaces(userPost)
-    
+
     # Create a SequenceMatcher object
     seq_matcher = SequenceMatcher(None, userPost, originalContentPost)
 

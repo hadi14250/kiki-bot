@@ -20,6 +20,7 @@ from calculateTotalReward import calculateTotalReward
 from addInvalidUsersToExcelSheet import addInvalidUsersToExcelSheet
 from dotenv import load_dotenv
 from getCredentials import getBotJwtTokenEnv
+from addInvalidUsersToExcelSheet import addInvalidPostsToExcelSheet, addValidPostsToExcelSheet, add_InValid_Followers_But_Valid_Posts_To_Excel_Sheet
 
 load_dotenv()
 
@@ -124,7 +125,7 @@ def calcPaymentFollowers(followers, contentSimilarity):
     if (contentSimilarity < 85) or ((followers) and (followers < 0)):
         return (0)
     if (followers == None):
-        return (10)
+        return (0)
     if (followers >= 0) and (followers <= 1000):
         return (10)
     elif (followers >= 1000) and (followers <= 5000):
@@ -147,7 +148,6 @@ def calcPaymentFollowers(followers, contentSimilarity):
 
 
 def calculateTotalPostsReward(post):
-
     if (checkUserNamePresence(post.scomUserName, post.postText) == None):
         totalPayment = 0
     else:
@@ -158,12 +158,10 @@ def parsePosts(parsedPosts, originalPostContent):
     posts = []
     for post in parsedPosts:
         if (post.socialMediaType == "Instagram"):
-            # post.excractedUserName = checkUserNamePresence(post.socialMedia, post.html)
             post.postText = extractInstaPostData(post.html, post.soupHtml, "content")
             post.contentSimilarity = get_similarity_percentage(post.postText, originalPostContent, "insta")
             post.totalPayment = calculateTotalPostsReward(post)
         elif (post.socialMediaType == "TikTok"):
-            # post.excractedUserName = extractTiktokPostData(post.soupHtml, "userName", post.socialMedia, post.html)
             post.postText = extractTiktokPostData(post.soupHtml, "content", post.socialMedia, post.html)
             post.contentSimilarity = get_similarity_percentage(post.postText, originalPostContent, "tiktok")
             post.totalPayment = calculateTotalPostsReward(post)
@@ -172,14 +170,24 @@ def parsePosts(parsedPosts, originalPostContent):
             post.postText = getTweet(post.soupHtml)
             post.contentSimilarity = get_similarity_percentage(post.postText, originalPostContent, "twitter")
             post.totalPayment = calculateTotalPostsReward(post)
-
+        print("post Text: | ", post.postText, " | Content Similraity: ", post.contentSimilarity, " total payment: ", post.totalPayment)
         if (post.totalPayment > 0):
             post.validated = True
-        # else:
-        #     try:
-        #         addInvalidPostsToExcelSheet(post)
-        #     except:
-                # print("Couldn't add user to excel sheet")
+            try:
+                addValidPostsToExcelSheet(post)
+            except:
+                print("Couldn't add user to excel sheet")
+
+        elif  (post.followers is not None and post.followers < 0) and ((post.contentSimilarity is not None) and (post.contentSimilarity > 85)):
+            try:
+                add_InValid_Followers_But_Valid_Posts_To_Excel_Sheet(post)
+            except:
+                print("Couldn't add user to excel sheet")
+        else:
+            try:
+                addInvalidPostsToExcelSheet(post)   
+            except:
+                print("Couldn't add user to excel sheet")
         posts.append({
         "id": post.id,
         "reward": post.validated,

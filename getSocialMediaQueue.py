@@ -17,7 +17,7 @@ from extractTwitterProfileData import extractTwitterUserInteractionCount
 from extractTweet import getTweet
 from sequenceMatcher import get_similarity_percentage
 from calculateTotalReward import calculateTotalReward
-from addInvalidUsersToExcelSheet import addInvalidUsersToExcelSheet
+from addInvalidUsersToExcelSheet import addInvalidUsersToExcelSheet, addValidUsersToExcelSheet
 from dotenv import load_dotenv
 from getCredentials import getBotJwtTokenEnv
 
@@ -129,14 +129,17 @@ def parseFollowers(parsedSocialMediaAccounts):
             user.followers = 0
         if (user.followers is not None) and (int(user.followers) > 0):
             user.validated = True
-        else:
             try:
-                # adding this because incase followers are none db doesnt accept them
-                user.followers = 0
+                addValidUsersToExcelSheet(user)
+            except:
+                print("Couldn't add user(s) to excel sheet")
+        elif (user.followers == None):
+            user.validated = True
+            user.followers = -1
+            try:
                 addInvalidUsersToExcelSheet(user)
             except:
                 print("Couldn't add user(s) to excel sheet")
-
         SocialMediaAccountsToDB.append({
         "id": user.id,
         "valid": user.validated,

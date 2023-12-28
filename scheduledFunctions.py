@@ -10,31 +10,33 @@ import json
 
 load_dotenv()
 
-campaigneBody = {
-    "order": "ASC",
-    "page": 1,
-    "take": 10
-}
 
-campaigneUrl = "http://localhost:3000/api/campaign/paginate/true"
-
-def sendPostReqCampaignPaginate():
+def returnCampaignContentFromPaginate():
+    campaigneBody = {
+        "order": "ASC",
+        "page": 1,
+        "take": 10
+    }
+    campaigneUrl = "http://localhost:3000/api/campaign/paginate/true"
     headers = {
         "Content-Type": "application/json",
     }
     response = requests.post(campaigneUrl, data=json.dumps(campaigneBody), headers=headers)
+    
     if response.status_code in [200, 201]:
         data = response.json().get("data", [])
+        content = ""  # Initialize content variable outside the loop
+        
         for item in data:
             content = item.get("content", "")
-        return (content)
+        
+        return content
     else:
-        print(f"Failed to retreive campaign content with status code: {response.status_code}")
+        print(f"Failed to retrieve campaign content with status code: {response.status_code}")
         print(response.text)
-        return (None)
+        return None
 
 
-originalPostContent = "🌟 Calling all adventurers! The quest to uncover SCOM's elusive dad, the one and only Reese (aka our dev's dad), is officially underway! 🚀 Join the expedition and be a part of the excitement as we unravel the mystery surrounding his whereabouts. 🕵️‍♂️ Your contribution could be the"
 threads_per_batch = 250
 
 # # ---------> Social Media get request and then parse to a json object (SocialMediaAccountsToDB) that will be sent to queue <----------
@@ -55,11 +57,11 @@ def runSocialMediaScheduler():
 
 # # ---------> Posts get request and then parse to a json object (postsToDB) that will be sent to queue <----------
 def runPostScheduler():
-    # originalPostContent = sendPostReqCampaignPaginate()
-    # if (originalPostContent == None):
-    #     return
-    # print("Campaigne Content: ", originalPostContent)
-    # sleep (5)
+    originalPostContent = returnCampaignContentFromPaginate()
+    if (originalPostContent is None) or (originalPostContent.strip() == ""):
+        return(print("No Active campaigne yet, checking again in 30 minutes"))
+    print("Campaigne Content: ", originalPostContent)
+    sleep (5)
     postResponseJson = getPostQueue()
     if (postResponseJson != None):
         print("Someone Applied for a reward")
@@ -71,3 +73,6 @@ def runPostScheduler():
     else:
         print("No New Reward Applicants Yet, trying again in 30 mins")
 # # -----------------------------
+
+
+string = "🌟 Calling all adventurers! The quest to uncover SCOM's elusive dad, the one and only Reese (aka our dev's dad), is officially underway! 🚀 Join the expedition and be a part of the excitement as we unravel the mystery surrounding his whereabouts. 🕵️‍♂️ Your contribution could be the"
