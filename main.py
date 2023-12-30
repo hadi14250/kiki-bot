@@ -41,7 +41,7 @@ tPosts = run_threadedPosts(runPostScheduler)
 
 while True:
     schedule.run_pending()
-    time.sleep(6)
+    time.sleep(600)
     if not (tSocialMedia.is_alive()):
         tSocialMedia = run_threadedSocialMedia(runSocialMediaScheduler)
     if not (tPosts.is_alive()):
