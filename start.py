@@ -5,7 +5,8 @@ from getCredentials import getAdminJwtTokenEnv, getBotJwtTokenEnv
 # getting tokens and loading them into the .env and the environment
 
 # Loads .env into envirnment
-load_dotenv()
+# load_dotenv()
+
 adminToken = getAdminToken()
 botToken = getBotToken(adminToken)
 setAdminJwtToken(adminToken)

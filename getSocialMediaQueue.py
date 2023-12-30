@@ -20,10 +20,24 @@ from calculateTotalReward import calculateTotalReward
 from addInvalidUsersToExcelSheet import addInvalidUsersToExcelSheet, addValidUsersToExcelSheet
 from dotenv import load_dotenv
 from getCredentials import getBotJwtTokenEnv
+from logger import startLogger
 
-load_dotenv()
+logger = startLogger()
+
+# load_dotenv()
+
 jwt_token = getBotJwtTokenEnv()
-url = "http://localhost:3000/api/bot/social"
+
+def getAccountApiDomain():
+    domain = os.environ.get("API_DOMAIN")
+    if domain != None:
+        SocialApiUrl = domain + "/api/bot/social"
+    else:
+        raise Exception("API Domain is None")
+    return (SocialApiUrl)
+
+SocialApiUrl = getAccountApiDomain()
+
 
 headers = {
     "Authorization": f"Bearer {jwt_token}",
@@ -32,16 +46,17 @@ headers = {
 
 def getSocialMediaQueue():
     try:
-        response = requests.get(url, headers=headers)
+        response = requests.get(SocialApiUrl, headers=headers)
         if (response.status_code == 200):
             social_data = response.json()
             return (social_data)
         else:
             response.raise_for_status()
-            print(response.text)
+            logger.info(response.text)
             return(None)
     except requests.exceptions.RequestException as e:
-        print(f"Error: {e}")
+        if (response.status_code != 404):
+            logger.error(f"Error: {e}", exc_info=True)
         return (None)
 
 # ----------------> Functions <----------------
@@ -67,12 +82,12 @@ def make_request(userAccount, payload, proxyUsername, proxyPassWord, retry_attem
 
             break  # Successful request, exit the loop
         except (ConnectionError, HTTPError, Timeout, TooManyRedirects, SSLError, RequestException) as e:
-            print(f"An error occurred: {e}")
+            logger.error(f"An error occurred: {e}", exc_info=True)
             if attempt < retry_attempts - 1:
-                print(f"Retry Number {attempt + 1} for {userAccount.scomUserName} in {retry_delay} seconds...")
+                logger.info(f"Retry Number {attempt + 1} for {userAccount.scomUserName} in {retry_delay} seconds...")
                 time.sleep(retry_delay)
             else:
-                print(f"\033[91mMax retries reached. Request failed for {userAccount.scomUserName}\033[0m")
+                logger.error(f"\033[91mMax retries reached. Request failed for {userAccount.scomUserName}\033[0m", exc_info=True)
 
 
 def run_threads(thread_queue, num_threads_to_run):
@@ -84,14 +99,13 @@ def run_threads(thread_queue, num_threads_to_run):
             thread = thread_queue.pop(0)
             threads_to_run.append(thread)
 
-    # Start and wait for the threads to finish
-    print("\033[92mstarting a new batch\033[0m")
+    logger.info("\033[92mstarting a new batch\033[0m")
     for thread in threads_to_run:
         thread.start()
         time.sleep(0.3)
     for thread in threads_to_run:
         thread.join()
-    print("\033[92mlast batch finished\033[0m")
+    logger.info("\033[92mlast batch finished\033[0m")
 
 
 
@@ -113,8 +127,6 @@ def runSocialMediaThreads(parsedSocialMediaAccounts, threads_per_batch):
     while threads:
         run_threads(threads, threads_per_batch)
 
-def validateBeforeSending(SocialMediaAccountsToDB):
-    print("Dont forget to adad a function in parseFollowers() to validate the object before sending to db")
 
 def parseFollowers(parsedSocialMediaAccounts):
     SocialMediaAccountsToDB = []
@@ -132,26 +144,25 @@ def parseFollowers(parsedSocialMediaAccounts):
             try:
                 addValidUsersToExcelSheet(user)
             except:
-                print("Couldn't add user(s) to excel sheet")
+                logger.info("Couldn't add user(s) to excel sheet")
         elif (user.followers == None):
             user.validated = True
             user.followers = -1
             try:
                 addInvalidUsersToExcelSheet(user)
             except:
-                print("Couldn't add user(s) to excel sheet")
+                logger.info("Couldn't add user(s) to excel sheet")
         SocialMediaAccountsToDB.append({
         "id": user.id,
         "valid": user.validated,
         "followers": user.followers
         })
-        validateBeforeSending(SocialMediaAccountsToDB)
     return (SocialMediaAccountsToDB)
 
 def sendSocialMediaToDB(SocialMediaAccountsToDB):
-    response = requests.post(url, data=json.dumps(SocialMediaAccountsToDB), headers=headers)
+    response = requests.post(SocialApiUrl, data=json.dumps(SocialMediaAccountsToDB), headers=headers)
     if (response.status_code == 200) or (response.status_code == 201):
-        print("Users added successfully!")
+        logger.info("Users added successfully!")
     else:
-        print(f"Request failed with status code: {response.status_code}")
-        print(response.text)
+        logger.error(f"Request failed with status code: {response.status_code}", exc_info=True)
+        logger.error(response.text, exc_info=True)

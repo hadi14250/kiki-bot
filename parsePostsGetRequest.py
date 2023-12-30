@@ -4,7 +4,7 @@ from formatHtml import formatHtml
 from bs4 import BeautifulSoup
 
 class Post:
-	def __init__(self, scomuserNum, id, socialMedia, socialMediaType, url, scomUserName, followers, instaStory, campaing):
+	def __init__(self, scomuserNum, id, socialMedia, socialMediaType, url, scomUserName, followers, instaStory, campaing, walletAddr):
 		self.scomuserNum		    = scomuserNum
 		self.id		            = id
 		self.socialMedia	    = socialMedia
@@ -14,6 +14,7 @@ class Post:
 		self.followers          = followers
 		self.instaStory         = instaStory
 		self.campaing           = campaing
+		self.walletAddr			= walletAddr
 		self.validated          = False
 		self.response			= None
 		self.html				= None
@@ -22,7 +23,7 @@ class Post:
 		self.excractedUserName	= None
 		self.postText			= None
 		self.payment			= 0
-		self.contentSimilarity = 0
+		self.contentSimilarity	= 0
 
 
 	def	formatHtmlResponse(self, response):
@@ -32,19 +33,21 @@ class Post:
 		if (self.html):
 			self.soupHtml = BeautifulSoup(self.html, "html.parser")
 
-user_objects = []
+
 def parsePostsGetRequest(response_json):
-    for item in response_json:
-        scomuserNum = item.get("scomuser")
-        user_id = item.get("id")
-        socialMedia = item.get("name")
-        socialMediaType = item.get("type")
-        url = item.get("url")
-        followers = item.get("followers")
-        instaStory = item.get("instaStory")
-        campaing = item.get("campaing")
-        scomUserName = "scomuser-" + str(scomuserNum) if scomuserNum is not None else None
-        user_object = Post(
+	user_objects = []
+	for item in response_json:
+		scomuserNum = item.get("scomuser")
+		user_id = item.get("id")
+		socialMedia = item.get("account")
+		socialMediaType = item.get("type")
+		url = item.get("url")
+		followers = item.get("followers")
+		instaStory = item.get("instaStory")
+		campaing = item.get("campaing")
+		walletAddr = item.get("walletAddr")
+		scomUserName = "scomuser-" + str(scomuserNum) if scomuserNum is not None else None
+		user_object = Post(
             scomuserNum,
             user_id,
             socialMedia,
@@ -53,9 +56,10 @@ def parsePostsGetRequest(response_json):
             scomUserName,
 			followers,
 			instaStory,
-			campaing
+			campaing, 
+			walletAddr
         )
-        user_objects.append(user_object)
-    return (user_objects)
+		user_objects.append(user_object)
+	return (user_objects)
 
 

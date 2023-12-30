@@ -15,20 +15,3 @@ def getInstaFollowers(soupHtml):
         return getting_parse_data(meta.attrs['content'])
     else:
         return None
-
-# ----------->	below code os for testing purposes	<------------
-
-# directory_path = "instagramProfilesHtmlFile"  # Replace with your actual directory path
-
-# # List all files in the directory
-# file_list = os.listdir(directory_path)
-
-# counter = 1
-
-# for file_name in file_list:
-# 	file_path = os.path.join(directory_path, file_name)
-#     # Check if it's a file (not a directory)
-# 	if os.path.isfile(file_path):
-# 		with open(file_path, "r", encoding="utf-8", errors="replace") as file:
-# 			file_content = file.read()
-# 	print(getInstaFollowers(file_content))

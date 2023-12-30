@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+# load_dotenv()
 
 def	getProxyUsername():
 	proxyUsername = os.environ.get("PROXY_USERNAME")
@@ -41,7 +41,6 @@ def	getAdminJwtTokenEnv():
 	if not (adminJwtToken):
 		return (None)
 	return (adminJwtToken)
-
 
 
 

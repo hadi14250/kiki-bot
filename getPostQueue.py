@@ -20,12 +20,24 @@ from calculateTotalReward import calculateTotalReward
 from addInvalidUsersToExcelSheet import addInvalidUsersToExcelSheet
 from dotenv import load_dotenv
 from getCredentials import getBotJwtTokenEnv
-from addInvalidUsersToExcelSheet import addInvalidPostsToExcelSheet, addValidPostsToExcelSheet, add_InValid_Followers_But_Valid_Posts_To_Excel_Sheet
+from addInvalidUsersToExcelSheet import addInvalidPostsToExcelSheet, addValidPostsToExcelSheet, add_InValid_Followers_But_Valid_Posts_To_Excel_Sheet, addInstaStoryToExcelSheet
+from logger import startLogger
 
-load_dotenv()
+logger = startLogger()
+
+# load_dotenv()
 
 jwt_token = getBotJwtTokenEnv()
-url = "http://localhost:3000/api/bot/posts"
+
+def getPostApiDomain():
+    domain = os.environ.get("API_DOMAIN")
+    if domain != None:
+        PostApiUrl = domain + "/api/bot/posts"
+    else:
+        raise Exception("API Domain is None")
+    return (PostApiUrl)
+
+PostApiUrl = getPostApiDomain()
 
 headers = {
     "Authorization": f"Bearer {jwt_token}",
@@ -34,16 +46,17 @@ headers = {
 
 def getPostQueue():
     try:
-        response = requests.get(url, headers=headers)
+        response = requests.get(PostApiUrl, headers=headers)
         if (response.status_code == 200):
             post_data = response.json()
             return (post_data)
         else:
             response.raise_for_status()
-            print(response.text)
+            logger.info(response.text)
             return(None)
     except requests.exceptions.RequestException as e:
-        print(f"Error: {e}")
+        if (response.status_code != 404):
+            logger.error(f"Error: {e}", exc_info=True)
         return (None)
 
 
@@ -70,33 +83,29 @@ def make_request(post, payload, proxyUsername, proxyPassWord, retry_attempts=3, 
 
             break  # Successful request, exit the loop
         except (ConnectionError, HTTPError, Timeout, TooManyRedirects, SSLError, RequestException) as e:
-            print(f"An error occurred: {e}")
+            logger.error(f"Error: {e}", exc_info=True)
             if attempt < retry_attempts - 1:
-                print(f"Retry Number {attempt + 1} for {post.scomUserName} in {retry_delay} seconds...")
+                logger.info(f"Retry Number {attempt + 1} for {post.scomUserName} in {retry_delay} seconds...")
                 time.sleep(retry_delay)
             else:
-                print(f"\033[91mMax retries reached. Request failed for {post.scomUserName}\033[0m")
+                logger.info(f"\033[91mMax retries reached. Request failed for {post.scomUserName}\033[0m")
 
 
 def run_threads(thread_queue, num_threads_to_run):
     threads_to_run = []
 
-    # Pop the specified number of threads from the queue
     for _ in range(num_threads_to_run):
         if thread_queue:
             thread = thread_queue.pop(0)
             threads_to_run.append(thread)
 
-    # Start and wait for the threads to finish
-    print("\033[92mstarting a new batch\033[0m")
+    logger.info("\033[92mstarting a new batch\033[0m")        
     for thread in threads_to_run:
         thread.start()
         time.sleep(0.3)
     for thread in threads_to_run:
         thread.join()
-    print("\033[92mlast batch finished\033[0m")
-
-
+    logger.info("\033[92mlast batch finished\033[0m")
 
 # Credentials
 proxyUsername = getProxyUsername()
@@ -118,15 +127,16 @@ def runPostThreads(parsedPosts, threads_per_batch):
 
 
 def calcPaymentFollowers(followers, contentSimilarity):
-    print("Remember to change the followers back to 300")
     followers = int(followers) if followers else 0  # Convert to int if followers is not None
     contentSimilarity = int(contentSimilarity) if str(contentSimilarity).replace('.', '').isdigit() else 0  # Convert to int if contentSimilarity is a digit
-    
-    if (contentSimilarity < 85) or ((followers) and (followers < 0)):
+
+    if (contentSimilarity == None):
+        return (0)
+    if (contentSimilarity < 85) or ((followers) and (followers < 300)):
         return (0)
     if (followers == None):
         return (0)
-    if (followers >= 0) and (followers <= 1000):
+    if (followers >= 300) and (followers <= 1000):
         return (10)
     elif (followers >= 1000) and (followers <= 5000):
         return (25)
@@ -157,7 +167,11 @@ def calculateTotalPostsReward(post):
 def parsePosts(parsedPosts, originalPostContent):
     posts = []
     for post in parsedPosts:
-        if (post.socialMediaType == "Instagram"):
+        if (post.instaStory == True):
+            post.postText = "NO_CONTENT"
+            post.contentSimilarity = 0
+            post.totalPayment = 0
+        elif (post.socialMediaType == "Instagram"):
             post.postText = extractInstaPostData(post.html, post.soupHtml, "content")
             post.contentSimilarity = get_similarity_percentage(post.postText, originalPostContent, "insta")
             post.totalPayment = calculateTotalPostsReward(post)
@@ -170,24 +184,27 @@ def parsePosts(parsedPosts, originalPostContent):
             post.postText = getTweet(post.soupHtml)
             post.contentSimilarity = get_similarity_percentage(post.postText, originalPostContent, "twitter")
             post.totalPayment = calculateTotalPostsReward(post)
-        print("post Text: | ", post.postText, " | Content Similraity: ", post.contentSimilarity, " total payment: ", post.totalPayment)
-        if (post.totalPayment > 0):
+        if (post.instaStory == True):
+            try:
+                addInstaStoryToExcelSheet(post)
+            except:
+                logger.error("Couldn't add user to excel sheet", exc_info=True)
+        elif (post.totalPayment > 0):
             post.validated = True
             try:
                 addValidPostsToExcelSheet(post)
             except:
-                print("Couldn't add user to excel sheet")
-
-        elif  (post.followers is not None and post.followers < 0) and ((post.contentSimilarity is not None) and (post.contentSimilarity > 85)):
+                logger.error("Couldn't add user to excel sheet", exc_info=True)
+        elif (post.followers is not None and post.followers < 0) and ((post.contentSimilarity is not None) and (float(post.contentSimilarity.rstrip('%')) > 85)):
             try:
                 add_InValid_Followers_But_Valid_Posts_To_Excel_Sheet(post)
-            except:
-                print("Couldn't add user to excel sheet")
+            except Exception as e:
+                logger.error("Couldn't add user to excel sheet", exc_info=True)
         else:
             try:
                 addInvalidPostsToExcelSheet(post)   
             except:
-                print("Couldn't add user to excel sheet")
+                logger.error("Couldn't add user to excel sheet", exc_info=True)
         posts.append({
         "id": post.id,
         "reward": post.validated,
@@ -196,9 +213,10 @@ def parsePosts(parsedPosts, originalPostContent):
     return (posts)
 
 def sendPostsToDB(postsToDB):
-    response = requests.post(url, data=json.dumps(postsToDB), headers=headers)
+    response = requests.post(PostApiUrl, data=json.dumps(postsToDB), headers=headers)
     if (response.status_code == 200) or (response.status_code == 201):
-        print("Posts added successfully!")
+        logger.info("Posts send to DB successfully!")
     else:
-        print(f"Request failed with status code: {response.status_code}")
-        print(response.text)
+        logger.error(f"Request failed with status code: {response.status_code}", exc_info=True)
+        logger.error(response.text, exc_info=True)
+

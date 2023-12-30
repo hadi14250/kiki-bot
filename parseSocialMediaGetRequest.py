@@ -26,25 +26,25 @@ class User:
 			self.soupHtml = BeautifulSoup(self.html, "html.parser")
 
 
-user_objects = []
 
 def parseSocialMediaGetRequest(response_json):
-    for item in response_json:
-        scomuserNum = item.get("scomuser")
-        user_id = item.get("id")
-        socialMedia = item.get("account")
-        socialMediaType = item.get("type")
-        url = constructUrl(socialMedia, socialMediaType)
-        scomUserName = "scomuser-" + str(scomuserNum) if scomuserNum is not None else None
-        user_object = User(
-            scomuserNum,
-            user_id,
-            socialMedia,
-            socialMediaType,
-            url,
-            scomUserName,
+	user_objects = []
+	for item in response_json:
+		scomuserNum = item.get("scomuser")
+		user_id = item.get("id")
+		socialMedia = item.get("account")
+		socialMediaType = item.get("type")
+		url = constructUrl(socialMedia, socialMediaType)
+		scomUserName = "scomuser-" + str(scomuserNum) if scomuserNum is not None else None
+		user_object = User(
+			scomuserNum,
+			user_id,
+			socialMedia,
+			socialMediaType,
+			url,
+			scomUserName,
         )
-        user_objects.append(user_object)
-    return (user_objects)
+		user_objects.append(user_object)
+	return (user_objects)
 	
 

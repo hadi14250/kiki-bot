@@ -7,9 +7,22 @@ from getCredentials import getAdminJwtTokenEnv
 from dotenv import load_dotenv
 import requests
 import json
+import os
+from logger import startLogger
 
-load_dotenv()
+logger = startLogger()
 
+# load_dotenv()
+
+def getCampaignetApiDomain():
+    domain = os.environ.get("API_DOMAIN")
+    if domain != None:
+        campaigneUrl = domain + "/api/campaign/paginate/true"
+    else:
+        raise Exception("API Domain is None")
+    return (campaigneUrl)
+
+campaigneUrl = getCampaignetApiDomain()
 
 def returnCampaignContentFromPaginate():
     campaigneBody = {
@@ -17,7 +30,6 @@ def returnCampaignContentFromPaginate():
         "page": 1,
         "take": 10
     }
-    campaigneUrl = "http://localhost:3000/api/campaign/paginate/true"
     headers = {
         "Content-Type": "application/json",
     }
@@ -32,8 +44,8 @@ def returnCampaignContentFromPaginate():
         
         return content
     else:
-        print(f"Failed to retrieve campaign content with status code: {response.status_code}")
-        print(response.text)
+        logger.error(f"Failed to retrieve campaign content with status code: {response.status_code}", exc_info=True)
+        logger.error(response.text, exc_info=True)
         return None
 
 
@@ -43,15 +55,11 @@ threads_per_batch = 250
 def runSocialMediaScheduler():
     socialMediaResponseJson = getSocialMediaQueue()
     if (socialMediaResponseJson != None):
-        print("someone signed up")
+        logger.info("someone signed up")
         parsedSocialMediaAccounts = parseSocialMediaGetRequest(socialMediaResponseJson)
         runSocialMediaThreads(parsedSocialMediaAccounts, threads_per_batch)
         SocialMediaAccountsToDB = parseFollowers(parsedSocialMediaAccounts)
-        print(SocialMediaAccountsToDB)
         sendSocialMediaToDB(SocialMediaAccountsToDB)
-
-    else:
-        print("No New Sign Ups Yet, trying again in 30 mins")
 # -----------------------------
 
 
@@ -59,20 +67,13 @@ def runSocialMediaScheduler():
 def runPostScheduler():
     originalPostContent = returnCampaignContentFromPaginate()
     if (originalPostContent is None) or (originalPostContent.strip() == ""):
-        return(print("No Active campaigne yet, checking again in 30 minutes"))
-    print("Campaigne Content: ", originalPostContent)
-    sleep (5)
+        logger.info("No Active campaigne yet, checking again in 30 minutes")
+        return ("NONE")
     postResponseJson = getPostQueue()
     if (postResponseJson != None):
-        print("Someone Applied for a reward")
+        logger.info("Someone Applied for a reward")
         parsedPosts = parsePostsGetRequest(postResponseJson)
         runPostThreads(parsedPosts, threads_per_batch)
         postsToDB = parsePosts(parsedPosts, originalPostContent)
-        print(postsToDB)
         sendPostsToDB(postsToDB)
-    else:
-        print("No New Reward Applicants Yet, trying again in 30 mins")
 # # -----------------------------
-
-
-string = "🌟 Calling all adventurers! The quest to uncover SCOM's elusive dad, the one and only Reese (aka our dev's dad), is officially underway! 🚀 Join the expedition and be a part of the excitement as we unravel the mystery surrounding his whereabouts. 🕵️‍♂️ Your contribution could be the"

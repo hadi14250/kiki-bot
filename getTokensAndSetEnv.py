@@ -1,28 +1,49 @@
 import requests
 from getCredentials import getAdminEmail, getAdminPassword
+from logger import startLogger
+import os
+logger = startLogger()
 
-adminUrl = "http://localhost:3000/api/auth/login"
-botUrl = "http://localhost:3000/api/bot/token"
+def getAdminApiDomain():
+    domain = os.environ.get("API_DOMAIN")
+    if domain != None:
+        adminUrl = domain + "/api/auth/login"
+    else:
+        raise Exception("API Domain is None")
+    return (adminUrl)
 
-# Send POST request
+def getBotApiDomain():
+    domain = os.environ.get("API_DOMAIN")
+    if domain != None:
+        botUrl = domain + "/api/bot/token"
+    else:
+        raise Exception("API Domain is None")
+    return (botUrl)
+
+adminUrl = getAdminApiDomain()
+
+botUrl = getBotApiDomain()
+
+timeout = 60
+
 def getAdminToken():
     try:
         payload = {
         "login": getAdminEmail(),
         "password": getAdminPassword()
         }
-        response = requests.post(adminUrl, json=payload)
+        response = requests.post(adminUrl, json=payload, timeout=timeout)
         # Check the response status
         if (response.status_code == 200):
             response_json = response.json()
             jwt_token = response_json.get("token")
             return (jwt_token)
         else:
-            print(f"admin jwt token Request failed with status code: {response.status_code}")
-            print(response.text)
+            logger.error(f"admin jwt token Request failed with status code: {response.status_code}", exc_info=True)
+            logger.error(response.text, exc_info=True)
     except:
-        print("Failed to get admin jwt token")
-
+        logger.error(f"admin jwt token Request failed with status code: {response.status_code}", exc_info=True)
+        logger.error(response.text, exc_info=True)
 
 def getBotToken(admin_jwt_token):
     try:
@@ -35,18 +56,16 @@ def getBotToken(admin_jwt_token):
             jwt_token = response_json.get("token")
             return (jwt_token)
         else:
-            print(f"bot jwt token Request failed with status code: {response.status_code}")
-            print(response.text)
+            logger.error(f"bot jwt token Request failed with status code: {response.status_code}", exc_info=True)
+            logger.error(response.text, exc_info=True)
     except:
-        print("Failed to get bot jwt token")
+            logger.error(f"bot jwt token Request failed with status code: {response.status_code}", exc_info=True)
+            logger.error(response.text, exc_info=True)
 
 
 def setAdminJwtToken(token):
-    # Read the existing content of the .env file
     with open(".env", "r") as f:
         lines = f.readlines()
-
-    # Update or add the ADMIN_JWT_TOKEN line
     found = False
     for i, line in enumerate(lines):
         if line.startswith("ADMIN_JWT_TOKEN="):
@@ -56,16 +75,13 @@ def setAdminJwtToken(token):
     if not found:
         lines.append(f"ADMIN_JWT_TOKEN={token}\n")
 
-    # Write the updated content back to the .env file
     with open(".env", "w") as f:
         f.writelines(lines)
 
 def setBotJwtToken(token):
-    # Read the existing content of the .env file
     with open(".env", "r") as f:
         lines = f.readlines()
 
-    # Update or add the ADMIN_JWT_TOKEN line
     found = False
     for i, line in enumerate(lines):
         if line.startswith("BOT_JWT_TOKEN="):
@@ -75,6 +91,5 @@ def setBotJwtToken(token):
     if not found:
         lines.append(f"BOT_JWT_TOKEN={token}\n")
 
-    # Write the updated content back to the .env file
     with open(".env", "w") as f:
         f.writelines(lines)

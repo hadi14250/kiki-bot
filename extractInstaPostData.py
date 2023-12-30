@@ -191,34 +191,3 @@ def	extractInstaPostData(postHtml, soupHtml, type):
 			return (postDate)
 	except:
 		return (None)
-
-
-
-
-# ----------->	below code os for testing purposes	<------------
-
-# directory_path = "instagramPostsHtmlFile"  # Replace with your actual directory path
-
-# # List all files in the directory
-# file_list = os.listdir(directory_path)
-
-# counter = 1
-
-# # Loop through each file and read its content
-# for file_name in file_list:
-# 	file_path = os.path.join(directory_path, file_name)
-#     # Check if it's a file (not a directory)
-# 	if os.path.isfile(file_path):
-# 		with open(file_path, "r", encoding="utf-8", errors="replace") as file:
-# 			file_content = file.read()
-# 			print("----------> ((->{}<-))\nusername".format(counter),
-# 				"\"[[[[[[{}]]]]]]\"".format(extractInstaPostData(file_content, "userName")),
-#                 "has:", 
-#                 extractInstaPostData(file_content, "likeCount"),
-#                 "likes",
-#                 "on Date",
-#                 extractInstaPostData(file_content, "postDate"),
-#                 f"-----> [[[[[[{extractInstaPostData(file_content, 'content')}]]]]]] <-----",
-#                 "\n<----------")
-# 	counter += 1
-            
