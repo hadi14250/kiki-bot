@@ -1,4 +1,4 @@
-# kiki_crypto
+# kiki
 
 tasks:
 
