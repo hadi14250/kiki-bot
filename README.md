@@ -1,13 +1,10 @@
 # kiki
 
-tasks:
+Python bot that over-passess the bot detection systems of X (Twitter), Tiktok, and Instagram and scrapes profiles looking for:
 
-add verifications for each url
+- Username
+- Follower Count
+- Post Count
+- Post Likes
+- Post / Tweet Texts
 
-try scraping an insta post url with a private account
-
--->test with verified accounts<--
-
--->we dont need the date property from the post because we dont know when will they register for the reward<--
-
--->Insta Username: malescall has 36K followers<-- -->it should be 36000
