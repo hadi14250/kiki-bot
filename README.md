@@ -3,9 +3,10 @@
 Kiki is a Python bot designed to bypass the bot detection systems of X (formerly Twitter), TikTok, and Instagram to scrape valuable profile information, including:
 
 - Username
-- Follower Count
+- Follower/Following Count
 - Post Count
 - Post Likes
+- Post Date
 - Post/Tweet Texts
 
 ## Overview
