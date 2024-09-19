@@ -3,9 +3,7 @@ import re
 def replaceEmojis(input_string):
     if not (input_string):
         return (None)
-    """
-    Replaces emoji codes in the input string with actual emojis.
-    """
+
     emoji_dict = {
         'ud83dudd75ufe0fu2642ufe0f': '🕵️‍♂️',
         'ud83cudf1f': '🌟',
@@ -228,196 +226,195 @@ def replaceEmojis(input_string):
         'ud83dudedd': '📝',
         'ud83dudede': '📞',
         'ud83dudedf': '📟',
-        'ud83dudca8': '💨',  # Wind Blowing Face
-        'ud83dudca7': '💧',  # Droplet
-        'ud83dudca6': '💦',  # Sweat Droplets
-        'ud83dudcaa': '💪',  # Flexed Biceps
-        'ud83dudca5': '💥',  # Collision
-        'ud83dudca3': '💣',  # Bomb
-        'ud83dudca2': '💢',  # Anger Symbol
-        'ud83dudca4': '💤',  # Zzz
-        'ud83dudc8a': '🎊',  # Confetti Ball
-        'ud83dudc8b': '🎋',  # Tanabata Tree
-        'ud83dudc8c': '🎌',  # Crossed Flags
-        'ud83dudc8d': '🎍',  # Pine Decoration
-        'ud83dudc8e': '🎎',  # Japanese Dolls
-        'ud83dudc8f': '🎏',  # Carp Streamer
-        'ud83dudc90': '🎐',  # Wind Chime
-        'ud83dudc91': '🎑',  # Moon Viewing Ceremony
-        'ud83dudc92': '🎒',  # School Satchel
-        'ud83dudc93': '🎓',  # Graduation Cap
-        'ud83dudc94': '🎔',  # Heart With Tip On The Left
-        'ud83dudc95': '🎕',  # Bouquet of Flowers
-        'ud83dudc96': '🎖️',  # Military Medal
-        'ud83dudc97': '🎗️',  # Reminder Ribbon
-        'ud83dudc98': '🎘',  # Musical Keyboard
-        'ud83dudc99': '🎙️',  # Studio Microphone
-        'ud83dudc9a': '🎚️',  # Level Slider
-        'ud83dudc9b': '🎛️',  # Control Knobs
-        'ud83dudc9c': '🎜',  # Film Frames
-        'ud83dudc9d': '🎝',  # Admission Tickets
-        'ud83dudc9e': '🎞️',  # Film Projector
-        'ud83dudc9f': '🎟️',  # Ticket
-        'ud83dudca0': '🎠',  # Carousel Horse
-        'ud83dudca1': '🎡',  # Ferris Wheel
-        'ud83dudca2': '🎢',  # Roller Coaster
-        'ud83dudca3': '🎣',  # Fishing Pole
-        'ud83dudca4': '🎤',  # Microphone
-        'ud83dudca5': '🎥',  # Movie Camera
-        'ud83dudca6': '🎦',  # Cinema
-        'ud83dudca7': '🎧',  # Headphone
-        'ud83dudca8': '🎨',  # Artist Palette
-        'ud83dudca9': '🎩',  # Top Hat
-        'ud83dudcaa': '🎪',  # Circus Tent
-        'ud83dudcab': '🎫',  # Ticket
-        'ud83dudcac': '🎬',  # Clapper Board
-        'ud83dudcad': '🎭',  # Performing Arts
-        'ud83dudcae': '🎮',  # Video Game
-        'ud83dudcaf': '🎯',  # Direct Hit
-        'ud83dudcb0': '🎰',  # Slot Machine
-        'ud83dudcb1': '🎱',  # Billiards
-        'ud83dudcb2': '🎲',  # Game Die
-        'ud83dudcb3': '🎳',  # Bowling
-        'ud83dudcb4': '🎴',  # Flower Playing Cards
-        'ud83dudcb5': '🎵',  # Musical Note
-        'ud83dudcb6': '🎶',  # Musical Notes
-        'ud83dudcb7': '🎷',  # Saxophone
-        'ud83dudcb8': '🎸',  # Guitar
-        'ud83dudcb9': '🎹',  # Musical Keyboard
-        'ud83dudcba': '🎺',  # Trumpet
-        'ud83dudcbb': '🎻',  # Violin
-        'ud83dudcbc': '🎼',  # Musical Score
-        'ud83dudcbd': '🎽',  # Running Shirt
-        'ud83dudcbe': '🎾',  # Tennis Racquet
-        'ud83dudcbf': '🎿',  # Ski and Ski Boot
-        'ud83dudcc0': '🏀',  # Basketball and Hoop
-        'ud83dudcc1': '🏁',  # Chequered Flag
-        'ud83dudcc2': '🏂',  # Snowboarder
-        'ud83dudcc3': '🏃',  # Runner
-        'ud83dudcc4': '🏄',  # Surfer
-        'ud83dudcc5': '🏅',  # Sports Medal
-        'ud83dudcc6': '🏆',  # Trophy
-        'ud83dudcc7': '🏇',  # Horse Racing
-        'ud83dudcc8': '🏈',  # American Football
-        'ud83dudcc9': '🏉',  # Rugby Football
-        'ud83dudcca': '🏊',  # Swimmer
-        'ud83dudccb': '🏋️',  # Weight Lifter
-        'ud83dudccc': '🏌️',  # Golfer
-        'ud83dudccd': '🏍️',  # Racing Motorcycle
-        'ud83dudcce': '🏎️',  # Racing Car
-        'ud83dudccf': '🏏',  # Cricket
-        'ud83dudccf': '🔥',  # fire
-        'ud83eudef6': '🛶',  #Canoe
-        'ud83dudcf7': '📷',  # Camera
-        'ud83dudc47': '👇',  # Backhand Index Pointing Down
-        'ud83dudc49': '👉',  # Backhand Index Pointing Right
-        'ud83dudce5': '📍',  # Round Pushpin
-        'ud83eudd23': '🤣',  # Rolling on the Floor Laughing
-        'ud83dudd25': '🔥',  # Collision
-        'ud83euddd1u200d': '🧑‍', #winking
-        'ud83dude80': '🚀',  # Rocket
-        'ud83dudc47': '👇',  # Backhand Index Pointing Down
-        'ud83euddd1': '🧑‍🚀',  # Astronaut
-        'ud83dudcf2': '📲',  # Mobile Phone with Arrow
-        'u2b07ufe0f': '⬇️',  # Down Arrow
-        'u2022':      '•',   # Bullet Point
-        'u2019':      '’',   # Right Single Quotation Mark
-        'u26a0': '⚠️',  # Warning Sign
-        'u00a9': '©',  # Copyright Sign
-        'u274c': '❌',  # Cross Mark
-        'u27a1ufe0f': '➡️',  # Right Arrow
-
-        'ud83dude00': '😀',  # Grinning Face
-        'ud83dude04': '😄',  # Smiling Face with Open Mouth and Smiling Eyes
-        'ud83dude42': '😂',  # Face with Tears of Joy
-        'ud83dude43': '😃',  # Smiling Face with Open Mouth
-        'ud83eudee0': '📰',  # Rolled-Up Newspaper
-        'ud83eudee3': '📣',  # Megaphone
-        'ud83eudee2': '📢',  # Loudspeaker
-        'ud83eudee1': '📡',  # Satellite Antenna
-        'ud83eude00': '📀',  # DVD
-        'ud83dude2a': '🌀',  # Cyclone
-        'u263aufe0f': '⚓',  # Anchor
-        'ud83dude11': '😔',  # Pensive Face
-        'ud83dude17': '😗',  # Kissing Face
-        'ud83eudee2': '📢',  # Loudspeaker
-        'ud83eudee3': '📣',  # Megaphone
-        'ud83eudee1': '📡',  # Satellite Antenna
-        'ud83eude10': '📐',  # Triangular Ruler
-        'ud83eudd28': '😨',  # Fearful Face
-        'ud83eudee8': '📨',  # Incoming Envelope
-        'ud83eudee5': '📥',  # Inbox Tray
-        'ud83eudee6': '📦',  # Package
-        'ud83dude36': '😶',  # Face Without Mouth
-        'ud83dude37': '😷',  # Face with Medical Mask
-        'ud83dude38': '😸',  # Grinning Cat with Smiling Eyes
-        'ud83dude39': '😹',  # Cat with Tears of Joy
-        'ud83dude3a': '😺',  # Smiling Cat with Heart-Eyes
-        'ud83dude3b': '😻',  # Cat with Wry Smile
-        'ud83dude3c': '😼',  # Kissing Cat
-        'ud83dude3d': '😽',  # Pouting Cat
-        'ud83dude3e': '😾',  # Crying Cat
-        'ud83dude3f': '😿',  # Weary Cat
-        'ud83dude40': '🙀',  # Cat with Open Mouth
-        'ud83eude8': '📨',  # Incoming Envelope
-        'ud83eudee8': '📨',  # Incoming Envelope (duplicate entry)
-        'ud83eudd23': '📣',  # Megaphone
-        'ud83eudee8': '📨',  # Incoming Envelope (duplicate entry)
-        'ud83eudee5': '📥',  # Inbox Tray
-        'ud83eudee6': '📦',  # Package
-        'ud83eudee2': '📢',  # Loudspeaker
-        'ud83eudee3': '📣',  # Megaphone
-        'ud83eudee1': '📡',  # Satellite Antenna
-        'ud83eudd22': '📢',  # Loudspeaker (duplicate entry)
-        'ud83eudd2e': '📦',  # Package (duplicate entry)
-        'ud83eudd27': '📨',  # Incoming Envelope (duplicate entry)
-        'ud83eudd75': '📣',  # Megaphone (duplicate entry)
-        'ud83eudd76': '📦',  # Package (duplicate entry)
-        'ud83eudd74': '📨',  # Incoming Envelope (duplicate entry)
-        'ud83eudd2f': '🚯',  # No Littering Symbol
-        'ud83eudd20': '🚠',  # Mountain Cableway
-        'ud83eudd73': '🛳️',  # Passenger Ship
-        'ud83eudd78': '🛸',  # Flying Saucer
-        'ud83dude80': '🚀',  # Rocket
-        'ud83eudee4': '📤',  # Outbox Tray
-        'ud83dude1f': '📟',  # Pager
-        'ud83dude41': '🕁',  # Empty Document
-        'u2639ufe0f': '☹️',  # White Frowning Face
-        'ud83eudee4': '📤',  # Outbox Tray (duplicate entry)
-        'ud83dude1f': '📟',  # Pager (duplicate entry)
-        'ud83dude41': '🕁',  # Empty Document (duplicate entry)
-        'u2639ufe0f': '☹️',  # White Frowning Face (duplicate entry)
-        'ud83dude44': '💄',  # Lipstick
-        'ud83eudea2': '🛢️',  # Oil Drum
-        'ud83dudeac': '💬',  # Speech Balloon
-        'ud83eudd79': '🛹',  # Skateboard
-        'ud83eude83': '📃',  # Page with Curl
-        'ud83eude75': '📵',  # No Mobile Phones
-        'ud83eude76': '📶',  # Antenna Bars
-        'ud83eude8e': '📎',  # Paperclip
-        'ud83eudeec': '🗬',  # Triangle Ruler
-        'ud83eudeed': '🗭',  # Protractor
-        'ud83eudeeb': '🗫',  # Label
-        'ud83eudee0': '🗠',  # Straight Ruler
-        'ud83eudee1': '🗡️',  # Dagger
-        'ud83eudd10': '🌐',  # Globe with Meridians
-        'ud83eudd28': '🌨',  # Cloud with Tornado
-        'ud83eudd11': '🌑',  # New Moon
-        'ud83eudee2': '🗢',  # Card Index Dividers
-        'ud83eudee3': '🗣️',  # Speaking Head
-        'ud83eudee2': '🗢',  # Card Index Dividers (duplicate entry)
-        'ud83eudee3': '🗣️',  # Speaking Head (duplicate entry)
-        'ud83eudee1': '🗡️',  # Dagger (duplicate entry)
-        'ud83eudd10': '🌐',  # Globe with Meridians (duplicate entry)
-        'ud83eudd36': '🌶️',  # Hot Pepper
-        'ud83eudee5': '🗥',  # Paper Tray
-        'ud83eudd2f': '🚯',  # No Littering Symbol (duplicate entry)
-        'ud83eudd20': '🚠',  # Mountain Cableway (duplicate entry)
-        'ud83eudd73': '🛳️',  # Passenger Ship (duplicate entry)
-        'ud83eudd78': '🛸',  # Flying Saucer (duplicate entry)
-        'ud83eudea2': '🛢️',  # Oil Drum (duplicate entry)
-        'ud83dude44': '💄',  # Lipstick (duplicate entry)
-        'ud83eudd25': '📥',  # Inbox Tray
+        'ud83dudca8': '💨',
+        'ud83dudca7': '💧',
+        'ud83dudca6': '💦',
+        'ud83dudcaa': '💪',
+        'ud83dudca5': '💥',
+        'ud83dudca3': '💣',
+        'ud83dudca2': '💢',
+        'ud83dudca4': '💤',
+        'ud83dudc8a': '🎊',
+        'ud83dudc8b': '🎋',
+        'ud83dudc8c': '🎌',
+        'ud83dudc8d': '🎍',
+        'ud83dudc8e': '🎎',
+        'ud83dudc8f': '🎏',
+        'ud83dudc90': '🎐',
+        'ud83dudc91': '🎑',
+        'ud83dudc92': '🎒',
+        'ud83dudc93': '🎓',
+        'ud83dudc94': '🎔',
+        'ud83dudc95': '🎕',
+        'ud83dudc96': '🎖️',
+        'ud83dudc97': '🎗️',
+        'ud83dudc98': '🎘',
+        'ud83dudc99': '🎙️',
+        'ud83dudc9a': '🎚️',
+        'ud83dudc9b': '🎛️',
+        'ud83dudc9c': '🎜',
+        'ud83dudc9d': '🎝',
+        'ud83dudc9e': '🎞️',
+        'ud83dudc9f': '🎟️',
+        'ud83dudca0': '🎠',
+        'ud83dudca1': '🎡',
+        'ud83dudca2': '🎢',
+        'ud83dudca3': '🎣',
+        'ud83dudca4': '🎤',
+        'ud83dudca5': '🎥',
+        'ud83dudca6': '🎦',
+        'ud83dudca7': '🎧',
+        'ud83dudca8': '🎨',
+        'ud83dudca9': '🎩',
+        'ud83dudcaa': '🎪',
+        'ud83dudcab': '🎫',
+        'ud83dudcac': '🎬',
+        'ud83dudcad': '🎭',
+        'ud83dudcae': '🎮',
+        'ud83dudcaf': '🎯',
+        'ud83dudcb0': '🎰',
+        'ud83dudcb1': '🎱',
+        'ud83dudcb2': '🎲',
+        'ud83dudcb3': '🎳',
+        'ud83dudcb4': '🎴',
+        'ud83dudcb5': '🎵',
+        'ud83dudcb6': '🎶',
+        'ud83dudcb7': '🎷',
+        'ud83dudcb8': '🎸',
+        'ud83dudcb9': '🎹',
+        'ud83dudcba': '🎺',
+        'ud83dudcbb': '🎻',
+        'ud83dudcbc': '🎼',
+        'ud83dudcbd': '🎽',
+        'ud83dudcbe': '🎾',
+        'ud83dudcbf': '🎿',
+        'ud83dudcc0': '🏀',
+        'ud83dudcc1': '🏁',
+        'ud83dudcc2': '🏂',
+        'ud83dudcc3': '🏃',
+        'ud83dudcc4': '🏄',
+        'ud83dudcc5': '🏅',
+        'ud83dudcc6': '🏆',
+        'ud83dudcc7': '🏇',
+        'ud83dudcc8': '🏈',
+        'ud83dudcc9': '🏉',
+        'ud83dudcca': '🏊',
+        'ud83dudccb': '🏋️',
+        'ud83dudccc': '🏌️',
+        'ud83dudccd': '🏍️',
+        'ud83dudcce': '🏎️',
+        'ud83dudccf': '🏏',
+        'ud83dudccf': '🔥',
+        'ud83eudef6': '🛶',
+        'ud83dudcf7': '📷',
+        'ud83dudc47': '👇',
+        'ud83dudc49': '👉',
+        'ud83dudce5': '📍',
+        'ud83eudd23': '🤣',
+        'ud83dudd25': '🔥',
+        'ud83euddd1u200d': '🧑‍',
+        'ud83dude80': '🚀',
+        'ud83dudc47': '👇',
+        'ud83euddd1': '🧑‍🚀',
+        'ud83dudcf2': '📲',
+        'u2b07ufe0f': '⬇️',
+        'u2022':      '•', 
+        'u2019':      '’', 
+        'u26a0': '⚠️',
+        'u00a9': '©',
+        'u274c': '❌',
+        'u27a1ufe0f': '➡️',
+        'ud83dude00': '😀',
+        'ud83dude04': '😄',
+        'ud83dude42': '😂',
+        'ud83dude43': '😃',
+        'ud83eudee0': '📰',
+        'ud83eudee3': '📣',
+        'ud83eudee2': '📢',
+        'ud83eudee1': '📡',
+        'ud83eude00': '📀',
+        'ud83dude2a': '🌀',
+        'u263aufe0f': '⚓',
+        'ud83dude11': '😔',
+        'ud83dude17': '😗',
+        'ud83eudee2': '📢',
+        'ud83eudee3': '📣',
+        'ud83eudee1': '📡',
+        'ud83eude10': '📐',
+        'ud83eudd28': '😨',
+        'ud83eudee8': '📨',
+        'ud83eudee5': '📥',
+        'ud83eudee6': '📦',
+        'ud83dude36': '😶',
+        'ud83dude37': '😷',
+        'ud83dude38': '😸',
+        'ud83dude39': '😹',
+        'ud83dude3a': '😺',
+        'ud83dude3b': '😻',
+        'ud83dude3c': '😼',
+        'ud83dude3d': '😽',
+        'ud83dude3e': '😾',
+        'ud83dude3f': '😿',
+        'ud83dude40': '🙀',
+        'ud83eude8': '📨',
+        'ud83eudee8': '📨',
+        'ud83eudd23': '📣',
+        'ud83eudee8': '📨',
+        'ud83eudee5': '📥',
+        'ud83eudee6': '📦',
+        'ud83eudee2': '📢',
+        'ud83eudee3': '📣',
+        'ud83eudee1': '📡',
+        'ud83eudd22': '📢',
+        'ud83eudd2e': '📦',
+        'ud83eudd27': '📨',
+        'ud83eudd75': '📣',
+        'ud83eudd76': '📦',
+        'ud83eudd74': '📨',
+        'ud83eudd2f': '🚯',
+        'ud83eudd20': '🚠',
+        'ud83eudd73': '🛳️',
+        'ud83eudd78': '🛸',
+        'ud83dude80': '🚀',
+        'ud83eudee4': '📤',
+        'ud83dude1f': '📟',
+        'ud83dude41': '🕁',
+        'u2639ufe0f': '☹️',
+        'ud83eudee4': '📤',
+        'ud83dude1f': '📟',
+        'ud83dude41': '🕁',
+        'u2639ufe0f': '☹️',
+        'ud83dude44': '💄',
+        'ud83eudea2': '🛢️',
+        'ud83dudeac': '💬',
+        'ud83eudd79': '🛹',
+        'ud83eude83': '📃',
+        'ud83eude75': '📵',
+        'ud83eude76': '📶',
+        'ud83eude8e': '📎',
+        'ud83eudeec': '🗬',
+        'ud83eudeed': '🗭',
+        'ud83eudeeb': '🗫',
+        'ud83eudee0': '🗠',
+        'ud83eudee1': '🗡️',
+        'ud83eudd10': '🌐',
+        'ud83eudd28': '🌨',
+        'ud83eudd11': '🌑',
+        'ud83eudee2': '🗢',
+        'ud83eudee3': '🗣️',
+        'ud83eudee2': '🗢',
+        'ud83eudee3': '🗣️',
+        'ud83eudee1': '🗡️',
+        'ud83eudd10': '🌐',
+        'ud83eudd36': '🌶️',
+        'ud83eudee5': '🗥',
+        'ud83eudd2f': '🚯',
+        'ud83eudd20': '🚠',
+        'ud83eudd73': '🛳️',
+        'ud83eudd78': '🛸',
+        'ud83eudea2': '🛢️',
+        'ud83dude44': '💄',
+        'ud83eudd25': '📥',
         'u200d': '',
     }
     for code, emoji_char in emoji_dict.items():
@@ -425,6 +422,6 @@ def replaceEmojis(input_string):
     
     pattern = re.compile(r'ud83[^\s]*')
     
-    # Replace matched substrings with an empty string
+    
     input_string = re.sub(pattern, ' ', input_string)
     return input_string
