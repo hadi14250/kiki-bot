@@ -18,6 +18,8 @@ from extractTweet import getTweet
 from sequenceMatcher import get_similarity_percentage
 from calculateTotalReward import calculateTotalReward
 
+proxy_url = os.environ.get("PROXY_URL")
+
 def deleteHtmlFiles():
     curentDir = os.getcwd()
     pattern = '{}/htmlFiles/*.html'.format(curentDir)
@@ -40,7 +42,7 @@ def make_request(userSocialMeida, payload, filename, proxyUsername, proxyPassWor
         try:
             response = requests.request(
                 'POST',
-                'https://realtime.oxylabs.io/v1/queries',
+                proxy_url,
                 auth=(proxyUsername, proxyPassWord),
                 json=payload,
                 timeout=120
@@ -81,16 +83,17 @@ def run_threads(thread_queue, num_threads_to_run):
 
 deleteHtmlFiles()
 
-userLimit = 5 # (1 user has 6 requests or 6 threads)
-usersPerBatch = 50
+userLimit = os.environ.get("USER_LIMIT")
+usersPerBatch = os.environ.get("USERS_PER_BATCH")
 originalPostContent = "🌟 Calling all adventurers! The quest to uncover SCOM's elusive dad, the one and only Reese (aka our dev's dad), is officially underway! 🚀 Join the expedition and be a part of the excitement as we unravel the mystery surrounding his whereabouts. 🕵️‍♂️ Your contribution could be the"
 
-threads_per_batch = usersPerBatch * 6
+threads_per_batch = usersPerBatch * os.environ.get("THREADS_MULTIPLIER")
+
 
 
 # Credentials
-proxyUsername = "hadi14250" #getProxyUsername()
-proxyPassword = "!zwTTdq86wLj6FM" #getProxyPassword()
+proxyUsername = os.environ.get("PROXY_USERNAME")
+proxyPassword = os.environ.get("PROXY_PW")
 
 threads = []
 for user in user_objects[:userLimit]:

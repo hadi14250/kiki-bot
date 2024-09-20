@@ -9,6 +9,10 @@ import os
 to_email = os.environ.get("EMAILING_LIST")
 cc_recipients = os.environ.get("EMAILING_LIST_CC")
 
+# time and region
+time_hour = os.environ.get("TIME_HOUR")
+time_region = os.environ.get("TIME_REGION")
+
 logger = startLogger()
 
 def excepthook(args):
@@ -34,7 +38,7 @@ def run_threadedSendEmails(job_func):
     job_thread.start()
     job_thread.join()
 
-schedule.every().day.at("16:00", "Asia/Dubai").do(run_threadedSendEmails, lambda: sendExcelSheetToMods(to_email, cc_recipients))
+schedule.every().day.at(time_hour, time_region).do(run_threadedSendEmails, lambda: sendExcelSheetToMods(to_email, cc_recipients))
 
 tSocialMedia = run_threadedSocialMedia(runSocialMediaScheduler)
 tPosts = run_threadedPosts(runPostScheduler)

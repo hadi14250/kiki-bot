@@ -6,25 +6,21 @@ def addInvalidUsersToExcelSheet(user):
     excel_file_path = "Daily_User_Data.xlsx"  
     sheet_name = "Invalid Accounts"  
 
-    
     try:
         workbook = openpyxl.load_workbook(excel_file_path)
     except FileNotFoundError:
         workbook = Workbook()
 
-    
     if sheet_name in workbook.sheetnames:
         sheet = workbook[sheet_name]
     else:
         sheet = workbook.create_sheet(sheet_name)
 
-        
         headers = ["ScomuserNum", "ID", "SocialMedia", "SocialMediaType", "ScomUserName", "URL", "Followers", "Validated", "ProxyJobID"]
         for col_num, header in enumerate(headers, 1):
             col_letter = get_column_letter(col_num)
             sheet[f"{col_letter}1"] = header
 
-    
     new_row = [
         user.scomuserNum,
         user.id,
@@ -51,12 +47,10 @@ def addValidUsersToExcelSheet(user):
     except FileNotFoundError:
         workbook = Workbook()
 
-    
     if sheet_name in workbook.sheetnames:
         sheet = workbook[sheet_name]
     else:
         sheet = workbook.create_sheet(sheet_name)
-
         
         headers = ["ScomuserNum", "ID", "SocialMedia", "SocialMediaType", "ScomUserName", "URL", "Followers", "Validated", "ProxyJobID"]
         for col_num, header in enumerate(headers, 1):

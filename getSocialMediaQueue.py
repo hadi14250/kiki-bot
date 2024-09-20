@@ -28,6 +28,8 @@ logger = startLogger()
 
 jwt_token = getBotJwtTokenEnv()
 
+proxy_url = os.environ.get("PROXY_URL")
+
 def getAccountApiDomain():
     domain = os.environ.get("API_DOMAIN")
     if domain != None:
@@ -72,7 +74,7 @@ def make_request(userAccount, payload, proxyUsername, proxyPassWord, retry_attem
         try:
             response = requests.request(
                 'POST',
-                'https://realtime.oxylabs.io/v1/queries',
+                proxy_url,
                 auth=(proxyUsername, proxyPassWord),
                 json=payload,
                 timeout=120
